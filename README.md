@@ -2,9 +2,11 @@
 
 TTTFS
 
+/ ! \ faire un make clean avant de push quelque chose
+
 TODO LIST:
 
-    1-faire la struct block
+    A VERIFIER --> 1-faire la struct block
     2-faire la fonction little-endian
     3-faire la struct DD-header
     4-faire la struct descriptor-block

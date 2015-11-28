@@ -1,6 +1,10 @@
 // --------------------------
 // > HEADER PRINCIPAL à inclure dans tous les fichiers .c
 
+#ifndef main_h
+#define main_h
+
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -30,14 +34,19 @@ const int ib = 1;
 // Définition des structures
 
 typedef struct {
-  char octets[BLOCK_SIZE]; // tableau contenant chaque octet
-  int free; // nombre d'octets disponibles dans le block
+    char octets[BLOCK_SIZE]; // tableau contenant chaque octet
+    int free; // nombre d'octets disponibles dans le block
 } block;
 
 typedef struct {
-  int val;
+    int val;
 } error;
 
 typedef struct {
-  int id;
+    int id;
 } disk_id;
+
+
+error start_disk(char *name,disk_id *id);
+
+#endif

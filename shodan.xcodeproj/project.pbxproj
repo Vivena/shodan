@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		F85D0E291C0A168800B8909E /* main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
+		F85D0E2A1C0A169D00B8909E /* ll.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ll.h; sourceTree = "<group>"; };
 		F8C77F5B1C08496F00396D57 /* tfs_create.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tfs_create.c; sourceTree = "<group>"; };
 		F8C77F5C1C08496F00396D57 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		F8C77F5D1C08496F00396D57 /* main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
-		F8C77F5E1C08496F00396D57 /* ll.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ll.h; sourceTree = "<group>"; };
 		F8C77F5F1C0859D900396D57 /* start_disk.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = start_disk.c; sourceTree = "<group>"; };
 		F8C77F601C085DF700396D57 /* read_block.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = read_block.c; sourceTree = "<group>"; };
 		F8C77F611C086C4800396D57 /* test.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = test.txt; sourceTree = "<group>"; };
@@ -22,14 +22,14 @@
 		F8C77F541C08490A00396D57 = {
 			isa = PBXGroup;
 			children = (
+				F85D0E2A1C0A169D00B8909E /* ll.h */,
+				F85D0E291C0A168800B8909E /* main.h */,
 				F8C77F5B1C08496F00396D57 /* tfs_create.c */,
 				F8C77F631C08720100396D57 /* util.c */,
-				F8C77F5C1C08496F00396D57 /* README.md */,
-				F8C77F5D1C08496F00396D57 /* main.h */,
-				F8C77F5E1C08496F00396D57 /* ll.h */,
-				F8C77F5F1C0859D900396D57 /* start_disk.c */,
 				F8C77F601C085DF700396D57 /* read_block.c */,
+				F8C77F5F1C0859D900396D57 /* start_disk.c */,
 				F8C77F621C08708900396D57 /* write_block.c */,
+				F8C77F5C1C08496F00396D57 /* README.md */,
 				F8C77F611C086C4800396D57 /* test.txt */,
 			);
 			sourceTree = "<group>";

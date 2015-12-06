@@ -13,11 +13,11 @@ TODO LIST:
 
     3-gestion du rea/write 
         3.1-read_physical (à verif)
-        3.2-write_physical (done)
+        3.2-write_physical (à verif
         3.3-write (à verif)
-        3.4-read 
-            3.4.1-implementer un systeme de cache
-            3.4.2-finir read
+        3.4-read (à verif)
+            3.4.1-implementer un systeme de cache(done)
+            3.4.2-finir read(done)
 
     4-faire la struct DD-header
 

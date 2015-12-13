@@ -3,6 +3,7 @@
 
 int main(int argc, char* argv[]){
   if (argc == 3 || argc == 4){
+
     // Initialisation 
     int size = argv[2];
     char name[1024];
@@ -12,6 +13,7 @@ int main(int argc, char* argv[]){
     else{
       strcpy(name,"disk.tfs");
     }
+
     // Création du disque
     disk_id* id = malloc(sizeof(disk_id));
     error e = start_disk(name,id);

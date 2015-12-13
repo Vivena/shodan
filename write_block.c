@@ -7,11 +7,11 @@
 //
 
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
-#include <string.h>
 #include <fcntl.h>
 #include "main.h"
-
+#include "ll.h"
 
 error write_physical_block(disk_id *id,block b,uint32_t num){
     error e;

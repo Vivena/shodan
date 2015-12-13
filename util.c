@@ -119,7 +119,7 @@
 #endif
 
 #include "main.h"
-
+const int ib = 1;
 
 uint32_t itoui(int i){
     uint32_t rez= (uint32_t) i;

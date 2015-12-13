@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdint.h>
 
 #define DEBUG
 
@@ -25,7 +26,6 @@ printf ("At Line %i ",__LINE__);\
 exit(1);}
 #endif
 
-const int ib = 1;
 #define is_bigendian() ( (*(char*)&ib) == 0 )
 #define BLOCK_SIZE 1024 //blocks de 1KB = 2^10 bits = 128 = 2^7 octets
 #define CACHE_MEMORY 8192 // cache de 8MB =2 ^13 blocks peut etre ajusté pour consommé 2% de la mem prise par le HDD
@@ -99,15 +99,6 @@ typedef struct {
 uint32_t itoui(int i);
 int uitoi(uint32_t i);
 
-//start_disk.c
-error start_disk(char *name,disk_id *id);
-
-//read_block.c
-error read_physical_block(disk_id *id,block *b,uint32_t num);
-error read_block(disk_id *id,block *b,uint32_t num);
-
-//write_block.c
-error write_physical_block(disk_id *id,block b,uint32_t num);
 
     
 

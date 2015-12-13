@@ -8,10 +8,10 @@
 
 #include <fcntl.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
-#include <string.h>
 #include "main.h"
-
+#include "ll.h"
 
 error read_physical_block(disk_id *id,block *b,uint32_t num){
     error e;
@@ -57,9 +57,11 @@ error read_block(disk_id *id,block *b,uint32_t num){
     error e;
     e.val=0;
     
+    /*
     pid_t pid1;
     pid_t pid2;
     int status;
+    */
     
     if(id->cache.cmemory[(SET(num))].TAG== (TAG(num)))// j'ai deja l'info cherché en cache, je la copie dans le block
         strcpy(b->octets ,id->cache.cmemory[(SET(num))].data.octets);
@@ -68,19 +70,23 @@ error read_block(disk_id *id,block *b,uint32_t num){
         if (id->cache.cmemory[(SET(num))].valide==true) { //l'info du cache doit etre mis à jour sur le HDD
             
             // crée un processus pour gerer l'acces memoire (trop long à attendre) gestion de termination par double fork
+	  /*
             if ((pid1 = fork())) {
                 waitpid(pid1, &status, 0);
             } else if (!pid1) {
                 if ((pid2 = fork())) {
                     exit(0);
                 } else if (!pid2) {
+	  */
                     write_physical_block(id, id->cache.cmemory[(SET(num))].data, num);// j'ecrit l'info du cache dans le HDD
+		    /*
                 } else {
                     // error
                 }
             } else {
                 // error
             }
+	  */
         }
         if ((read_physical_block(id,b,num)).val!=0) {// je met la nouvelle info dans le cache
             printf("error!!!"); // TODO message d'erreur à modif

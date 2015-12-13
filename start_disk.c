@@ -8,7 +8,7 @@
 
 #include <fcntl.h>
 #include "main.h"
-
+#include "ll.h"
 
 error start_disk(char *name,disk_id *id){
     error e;

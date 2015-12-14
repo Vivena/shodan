@@ -6,22 +6,26 @@ int main(int argc, char* argv[]){
 
     // Initialisation 
     int size = atoi(argv[2]);
-    char name[1024] = "disk.tfs";
+    char* name = malloc(sizeof(char));
     if (argc == 4){
-      strncpy(name,argv[3],1024);
+      strcpy(name,argv[3]);
+    }
+    else{
+      strcpy(name,"disk.tfs");
     }
 
     // Création du disque
     disk_id* id = malloc(sizeof(disk_id));
     error e = start_disk(name,id);
     if (e.val == 0){
-      printf("Disk %s created !\n", name);
       block block0;
-      // ECRIRE LA TAILLE SUR LES 4 PREMIERS OCTETS
+      uint32_t d = itoui(size);
+      memcpy(block0.octets,&d,sizeof(uint32_t));
       write_block(id,block0,0);
+      printf("Disk %s created ! - Size : %d \n", name, size);
     }
     else{
-      fprintf(stderr, "Error while creating disk.\n");
+      fprintf(stderr, "Error while creating disk, cannot create a disk at this directory.\n");
       return -1;
     }
   }

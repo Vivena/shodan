@@ -14,7 +14,7 @@ error start_disk(char *name,disk_id *id){
     error e;
     e.val=0;
     
-    id->id=open(name,O_RDWR);
+    id->id=open(name,O_RDWR | O_CREAT);
     if (id->id==-1) {
         e.val=-1;
     }

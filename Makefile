@@ -3,7 +3,7 @@ CFLAGS = -Wall
 EXEC = tfs_create tfs_partition
 HEADERS = $(wildcard *.h)
 OBJECTS = read_block.o write_block.o start_disk.o util.o
-MAIN_OBJECTS = tfs_create.o tfs_partition.o
+MAIN_OBJECTS = $(EXEC:=.o)
 
 all: $(EXEC)
 

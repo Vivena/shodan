@@ -3,6 +3,11 @@
 
 int main(int argc, char* argv[]){
   if (argc == 3 || argc == 4){
+    // Verification du mode
+    if (strcmp(argv[1],"-s") != 0){
+      fprintf(stderr, "Error : wrong option mode.\n");
+      return -1;
+    }
 
     // Initialisation 
     int size = atoi(argv[2]);
@@ -25,7 +30,7 @@ int main(int argc, char* argv[]){
       printf("Disk %s created ! - Size : %d \n", name, size);
     }
     else{
-      fprintf(stderr, "Error while creating disk, cannot create a disk at this directory.\n");
+      fprintf(stderr, "Error while creating disk.\n");
       return -1;
     }
   }

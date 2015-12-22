@@ -29,6 +29,8 @@ exit(1);}
 #define is_bigendian() ( (*(char*)&ib) == 0 )
 #define BLOCK_SIZE 1024 //blocks de 1KB = 2^10 bits = 128 = 2^7 octets
 #define CACHE_MEMORY 8192 // cache de 8MB =2 ^13 blocks peut etre ajusté pour consommé 2% de la mem prise par le HDD
+#define TTTFS_MAGIC_NUMBER 0x31534654
+#define TTTFS_VOLUME_BLOCK_SIZE 1024
 
 
 
@@ -89,6 +91,10 @@ typedef struct {
     int id;
     cache *cache;
 } disk_id;
+
+typedef struct {
+  block block;
+} TTTFS_description_block;
 
 #define TAG(m) ((m) & 0x1FFF)
 #define SET(m) (((m)>>13) & 0x7FFFF)

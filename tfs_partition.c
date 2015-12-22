@@ -35,7 +35,7 @@ int main(int argc, char* argv[]){
         disk_id* id = malloc(sizeof(disk_id));
         error e = start_disk(name,id);
         if (e.val == 0){
-            block *block0 = malloc(sizeof(block0));
+            block *block0 = malloc(sizeof(block));
             read_block(id,block0,0);
             
             // Ecriture du nombre de partitions dans le bloc 0
@@ -44,12 +44,34 @@ int main(int argc, char* argv[]){
             memcpy((block0->octets)+sizeof(uint32_t),&d,sizeof(uint32_t));
             
             // Ecriture de chaque taille de chaque partition dans le bloc 0
+	    int previous_partition_size = 0;
             for (i = 0; i < nb_partitions; i++){
                 d = itoui(sizes[i]);
-                memcpy((block0->octets)+((i+1)*sizeof(uint32_t)),&d,sizeof(uint32_t));
+                memcpy((block0->octets)+((i+2)*sizeof(uint32_t)),&d,sizeof(uint32_t));
+
+		// TTTFS description block
+		block *partition_block = malloc(sizeof(block));
+		read_block(id,partition_block,1+(i*previous_partition_size));
+		uint32_t a;
+		a = itoui(TTTFS_MAGIC_NUMBER); // id de la version
+		memcpy(partition_block->octets,&a,sizeof(uint32_t));
+		a = itoui(TTTFS_VOLUME_BLOCK_SIZE); // taille d'un block (1024 octets)
+		memcpy((partition_block->octets) + sizeof(uint32_t),&a,sizeof(uint32_t));
+		a = itoui(sizes[i]); // taille de la partition
+		memcpy((partition_block->octets) + (2*sizeof(uint32_t)),&a,sizeof(uint32_t));
+		a = itoui(1); // premier block libre : le 1
+		memcpy((partition_block->octets) + (3*sizeof(uint32_t)),&a,sizeof(uint32_t));
+		a = itoui(0); // le nombre de fichiers supportables ??
+		memcpy((partition_block->octets) + (4*sizeof(uint32_t)),&a,sizeof(uint32_t));
+		a = itoui(0); // le nombre de fichiers actuellement libres ??
+		memcpy((partition_block->octets) + (5*sizeof(uint32_t)),&a,sizeof(uint32_t));
+		a = itoui(0); // le numero du premier fichier libre du volume ??
+		memcpy((partition_block->octets) + (6*sizeof(uint32_t)),&a,sizeof(uint32_t));
+		write_block(id,partition_block,1+(i*previous_partition_size));
+
+		previous_partition_size = sizes[i];
             }
             
-            printf("%d\n", block0->octets[8]);
             write_block(id,block0,0);
             sync_disk(id);
             printf("Partition created !\n");

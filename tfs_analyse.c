@@ -18,9 +18,10 @@ int main(int argc, char* argv[]){
     uint32_t temp;
     int i,size,npart;
     int *tpart;
-    
+    char* name = malloc(sizeof(char));
+
     //verification de la taille de argv
-    if (argc !=2){
+    if (argc > 2){
         fprintf(stderr, "Error : wrong number of arguments.\n");
         return -1;
     }
@@ -31,8 +32,14 @@ int main(int argc, char* argv[]){
     id = malloc(sizeof(disk_id));
     
     //lancement du disque
-    if((e=start_disk(argv[1],id)).val!=0){
-        return e.val;
+    if (argc == 2){
+      strcpy(name,argv[1]);
+    }
+    else{
+      strcpy(name,"disk.tfs");
+    }
+    if((e=start_disk(name,id)).val!=0){
+      return e.val;
     }
     
     lseek(id->id,0,SEEK_SET);

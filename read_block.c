@@ -63,11 +63,11 @@ error read_block(disk_id *id,block *b,uint32_t num){
     int status;
     */
     
-    if(id->cache.cmemory[(SET(num))].TAG== (TAG(num)))// j'ai deja l'info cherché en cache, je la copie dans le block
-        strcpy(b->octets ,id->cache.cmemory[(SET(num))].data.octets);
+    if(id->cache->cmemory[(SET(num))].TAG== (TAG(num)))// j'ai deja l'info cherché en cache, je la copie dans le block
+        strcpy(b->octets ,id->cache->cmemory[(SET(num))].data->octets);
     
     else{// je ne l'ai pas dans le cache
-        if (id->cache.cmemory[(SET(num))].valide==true) { //l'info du cache doit etre mis à jour sur le HDD
+        if (id->cache->cmemory[(SET(num))].valide==1) { //l'info du cache doit etre mis à jour sur le HDD
             
             // crée un processus pour gerer l'acces memoire (trop long à attendre) gestion de termination par double fork
 	  /*
@@ -78,7 +78,7 @@ error read_block(disk_id *id,block *b,uint32_t num){
                     exit(0);
                 } else if (!pid2) {
 	  */
-                    write_physical_block(id, id->cache.cmemory[(SET(num))].data, num);// j'ecrit l'info du cache dans le HDD
+                    write_physical_block(id, id->cache->cmemory[(SET(num))].data, num);// j'ecrit l'info du cache dans le HDD
 		    /*
                 } else {
                     // error
@@ -91,9 +91,9 @@ error read_block(disk_id *id,block *b,uint32_t num){
         if ((read_physical_block(id,b,num)).val!=0) {// je met la nouvelle info dans le cache
             printf("error!!!"); // TODO message d'erreur à modif
         }
-        id->cache.cmemory[(SET(num))].valide=false;// la nouvelle info est la même que celle de l'HDD pour le moment, pas besoin de la réecrire
-        id->cache.cmemory[(SET(num))].TAG=TAG(num);// mise à jour du tag
-        strcpy(b->octets ,id->cache.cmemory[(SET(num))].data.octets);
+        id->cache->cmemory[(SET(num))].valide=0;// la nouvelle info est la même que celle de l'HDD pour le moment, pas besoin de la réecrire
+        id->cache->cmemory[(SET(num))].TAG=TAG(num);// mise à jour du tag
+        strcpy(b->octets ,id->cache->cmemory[(SET(num))].data->octets);
         
         
     }

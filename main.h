@@ -72,8 +72,8 @@ dans notre cas, on n'a pas acces au O, on se contente de la structure
 
 typedef struct{// correspond à une entrée du cache
     uint32_t TAG;// Voir au dessus
-    block data;
-    bool valide;// savoir si l'information est encore valide
+    block *data;
+    int valide;// savoir si l'information est encore valide
 }cache_block;
 
 typedef struct{
@@ -87,7 +87,7 @@ typedef struct {
 
 typedef struct {
     int id;
-    cache cache;
+    cache *cache;
 } disk_id;
 
 #define TAG(m) ((m) & 0x1FFF)

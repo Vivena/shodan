@@ -40,6 +40,7 @@ int main(int argc, char* argv[]){
             
             // Ecriture du nombre de partitions dans le bloc 0
             uint32_t d = itoui(nb_partitions);
+            printf("nbr partitions %i\n",d);
             memcpy((block0->octets)+sizeof(uint32_t),&d,sizeof(uint32_t));
             
             // Ecriture de chaque taille de chaque partition dans le bloc 0

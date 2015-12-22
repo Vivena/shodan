@@ -54,8 +54,8 @@ int main(int argc, char* argv[]){
     if (npart!=0) {
         //creation du tableau des tailles de partition
         tpart=malloc(sizeof(int)*npart);
-        for (i=0; i<size; i++) {
-            memcpy(b->octets+(i*sizeof(uint32_t)),&temp,sizeof(uint32_t));
+        for (i=0; i<npart; i++) {
+            memcpy(&temp,b->octets+((i+2)*sizeof(uint32_t)),sizeof(uint32_t));
             tpart[i]=uitoi(temp);
             printf("    partition %i : %i blocks\n",i,tpart[i]);
         }

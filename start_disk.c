@@ -15,7 +15,7 @@ error start_disk(char *name,disk_id *id){
     e.val=0;
     int i;
     
-    id->id=open(name,O_RDWR|O_APPEND);
+    id->id=open(name,O_RDWR);
     if (id->id==-1) {
         e.val=-1;
         //printf("pblm here\n");

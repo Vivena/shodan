@@ -34,9 +34,9 @@ error write_block(disk_id *id,block *b,uint32_t num){
     error e;
     e.val=0;
     
-    pid_t pid1;
-    pid_t pid2;
-    int status;
+    //pid_t pid1;
+    //pid_t pid2;
+    //int status;
     
     uint32_t d;
     memcpy(&d,b->octets,sizeof(uint32_t));

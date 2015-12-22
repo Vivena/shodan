@@ -18,7 +18,7 @@ error start_disk(char *name,disk_id *id){
     id->id=open(name,O_RDWR|O_APPEND);
     if (id->id==-1) {
         e.val=-1;
-        printf("pblm here\n");
+        //printf("pblm here\n");
     }
     id->cache=malloc(sizeof(cache));
     id->cache->cmemory = malloc( CACHE_MEMORY*sizeof(cache_block));

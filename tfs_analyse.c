@@ -6,6 +6,8 @@
 //
 //
 
+#include <sys/types.h>
+#include <unistd.h>
 #include "main.h"
 #include "ll.h"
 
@@ -33,17 +35,19 @@ int main(int argc, char* argv[]){
         return e.val;
     }
     
+    lseek(id->id,0,SEEK_SET);
+    
     //recuperation du 1er block
     if((e=read_block(id,b,0)).val!=0){
         return e.val;
     }
     
     //recuperation de la taille du disque dur et du nombre de partition
-    memcpy(b->octets,&temp,sizeof(uint32_t));
+    memcpy(&temp,b->octets,sizeof(uint32_t));
     size=uitoi(temp);
     printf("Size of the HDD: %i\n",size);
     
-    memcpy(b->octets+(sizeof(uint32_t)),&temp,sizeof(uint32_t));
+    memcpy(&temp,b->octets+(sizeof(uint32_t)),sizeof(uint32_t));
     npart=uitoi(temp);
     printf("%i partitions: \n", npart);
     

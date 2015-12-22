@@ -15,8 +15,9 @@
 
 error read_physical_block(disk_id *id,block *b,uint32_t num){
     error e;
+    e.val=0;
     int i=0;
-    uint32_t t;
+    uint32_t t,t1;
     char bi[sizeof(uint32_t)];
     char buff2[BLOCK_SIZE];
     
@@ -24,25 +25,26 @@ error read_physical_block(disk_id *id,block *b,uint32_t num){
     
     // read the size of the HDD in block sorted in the first block of the file
     read(id->id,bi,sizeof(uint32_t));
-    t=atoi(bi);
-    
+    memcpy(&t,bi,sizeof(uint32_t));
+   // printf("bi: %i\n",t);
     if (t>num) {// check if num is not too big
         lseek(id->id,BLOCK_SIZE*num,SEEK_SET);
         t=0;
-        
+        t1=0;
         // keep reading till we've reach the end of the block even if we find a '\0' or '\n'
-        while (t!=BLOCK_SIZE) {
             i=read(id->id,buff2,BLOCK_SIZE-t);
-            
+            //printf("read %i octets\n",i);
             if (i<0) {
                 e.val=-1;
                 return e;
             }
-            t+=i;
-            i=0;
-            strcat(b->octets,buff2);
+            memcpy(&t1,buff2,sizeof(uint32_t));
+            //printf("buffer: %i\n",t1);
+            memcpy(b->octets,buff2,sizeof(buff2));
+            memcpy(&t1,b->octets,sizeof(uint32_t));
+            //printf("block: %i\n",t1);
             memset(buff2,'\0',BLOCK_SIZE);
-        }
+        
     }
     else{
         printf("attempting to read outside the hard drive\n");
@@ -63,11 +65,12 @@ error read_block(disk_id *id,block *b,uint32_t num){
     int status;
     */
     
-    if(id->cache->cmemory[(SET(num))].TAG== (TAG(num)))// j'ai deja l'info cherché en cache, je la copie dans le block
+    if(id->cache->cmemory[(SET(num))].TAG== (TAG(num))&&(TAG(num)!=0)){// j'ai deja l'info cherché en cache, je la copie dans le block
+       // printf("dans le cache \n");
         strcpy(b->octets ,id->cache->cmemory[(SET(num))].data->octets);
-    
+    }
     else{// je ne l'ai pas dans le cache
-        if (id->cache->cmemory[(SET(num))].valide==1) { //l'info du cache doit etre mis à jour sur le HDD
+            if (id->cache->cmemory[(SET(num))].valide==1) { //l'info du cache doit etre mis à jour sur le HDD
             
             // crée un processus pour gerer l'acces memoire (trop long à attendre) gestion de termination par double fork
 	  /*
@@ -87,7 +90,8 @@ error read_block(disk_id *id,block *b,uint32_t num){
                 // error
             }
 	  */
-        }
+        
+    }
         if ((read_physical_block(id,b,num)).val!=0) {// je met la nouvelle info dans le cache
             printf("error!!!"); // TODO message d'erreur à modif
         }

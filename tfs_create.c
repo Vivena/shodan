@@ -27,6 +27,7 @@ int main(int argc, char* argv[]){
       uint32_t d = itoui(size);
       memcpy(block0.octets,&d,sizeof(uint32_t));
       write_block(id,block0,0);
+      sync_disk(id);
       printf("Disk %s created ! - Size : %d \n", name, size);
     }
     else{

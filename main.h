@@ -91,7 +91,8 @@ typedef struct {
 } disk_id;
 
 #define TAG(m) ((m) & 0x1FFF)
-#define SET(m) (((m)<<13) & 0x7FFFF)
+#define SET(m) (((m)>>13) & 0x7FFFF)
+#define MEM(m,n) ((m)<<13 | n)
 
 /* FUNCTIONS */
 

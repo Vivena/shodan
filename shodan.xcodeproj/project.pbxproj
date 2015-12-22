@@ -13,9 +13,11 @@
 		F8C77F5C1C08496F00396D57 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		F8C77F5F1C0859D900396D57 /* start_disk.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = start_disk.c; sourceTree = "<group>"; };
 		F8C77F601C085DF700396D57 /* read_block.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = read_block.c; sourceTree = "<group>"; };
-		F8C77F611C086C4800396D57 /* test.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = test.txt; sourceTree = "<group>"; };
 		F8C77F621C08708900396D57 /* write_block.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = write_block.c; sourceTree = "<group>"; };
 		F8C77F631C08720100396D57 /* util.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = util.c; sourceTree = "<group>"; };
+		F8F0863C1C29917C00F2FB86 /* tfs_partition.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tfs_partition.c; sourceTree = "<group>"; };
+		F8F0863D1C2991AB00F2FB86 /* sync_disk.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sync_disk.c; sourceTree = "<group>"; };
+		F8F0863E1C29933B00F2FB86 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -24,13 +26,15 @@
 			children = (
 				F85D0E2A1C0A169D00B8909E /* ll.h */,
 				F85D0E291C0A168800B8909E /* main.h */,
-				F8C77F5B1C08496F00396D57 /* tfs_create.c */,
 				F8C77F631C08720100396D57 /* util.c */,
 				F8C77F5F1C0859D900396D57 /* start_disk.c */,
 				F8C77F601C085DF700396D57 /* read_block.c */,
 				F8C77F621C08708900396D57 /* write_block.c */,
+				F8F0863C1C29917C00F2FB86 /* tfs_partition.c */,
+				F8C77F5B1C08496F00396D57 /* tfs_create.c */,
+				F8F0863D1C2991AB00F2FB86 /* sync_disk.c */,
 				F8C77F5C1C08496F00396D57 /* README.md */,
-				F8C77F611C086C4800396D57 /* test.txt */,
+				F8F0863E1C29933B00F2FB86 /* Makefile */,
 			);
 			sourceTree = "<group>";
 		};

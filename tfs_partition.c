@@ -50,6 +50,7 @@ int main(int argc, char* argv[]){
 
       printf("%d\n", block0->octets[8]);
       write_block(id,*block0,0);
+      sync_disk(id);
       printf("Partition created !\n");
     }
     else{

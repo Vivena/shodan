@@ -96,9 +96,9 @@ typedef struct {
   block block;
 } TTTFS_description_block;
 
-#define TAG(m) ((m) & 0x1FFF)
-#define SET(m) (((m)>>13) & 0x7FFFF)
-#define MEM(m,n) ((m)<<13 | n)
+#define SET(m) ((m) & 0x1FFF)
+#define TAG(m) (((m)>>13))
+#define MEM(m,n) ( m <<13 | n)
 
 /* FUNCTIONS */
 

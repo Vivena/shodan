@@ -31,11 +31,11 @@ int main(int argc, char* argv[]){
             block *block0;
             block0=malloc(sizeof(block));
             uint32_t d = itoui(size);
-            //printf("mise à jour de size à %i\n",d);
+            printf("mise à jour de size à %i\n",d);
             memcpy(block0->octets,&d,sizeof(uint32_t));
             
-            /*memcpy(&d,block0->octets,sizeof(uint32_t));
-            printf("apres mise à jour %i \n",d);*/
+            //memcpy(&d,block0->octets,sizeof(uint32_t));
+            printf("apres mise à jour %i \n",d);
             write_block(id,block0,0);
             sync_disk(id);
             printf("Disk %s created ! - Size : %d \n", name, size);

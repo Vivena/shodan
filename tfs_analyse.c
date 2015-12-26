@@ -44,13 +44,17 @@ int main(int argc, char* argv[]){
     
     lseek(id->id,0,SEEK_SET);
     
+    
     //recuperation du 1er block
-    if((e=read_block(id,b,0)).val!=0){
+    e=read_block(id,b,0);
+    if(e.val!=0){
         return e.val;
     }
     
     //recuperation de la taille du disque dur et du nombre de partition
+    
     memcpy(&temp,b->octets,sizeof(uint32_t));
+    printf("test avant %i\n",temp);
     size=uitoi(temp);
     printf("Size of the HDD: %i\n",size);
     

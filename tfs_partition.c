@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "main.h"
 #include "ll.h"
 
@@ -31,7 +33,7 @@ int main(int argc, char* argv[]){
             i++;
         }
         
-        // Récupération du disque (marche si le disque n'existe pas)
+        // Récupération du disque 
         disk_id* id = malloc(sizeof(disk_id));
         error e = start_disk(name,id);
         if (e.val == 0){
@@ -40,7 +42,6 @@ int main(int argc, char* argv[]){
             
             // Ecriture du nombre de partitions dans le bloc 0
             uint32_t d = itoui(nb_partitions);
-            printf("nbr partitions %i\n",d);
             memcpy((block0->octets)+sizeof(uint32_t),&d,sizeof(uint32_t));
             
             // Ecriture de chaque taille de chaque partition dans le bloc 0
@@ -51,7 +52,7 @@ int main(int argc, char* argv[]){
 
 		// TTTFS description block
 		block *partition_block = malloc(sizeof(block));
-		read_block(id,partition_block,1+(i*previous_partition_size));
+		read_block(id,partition_block,1+previous_partition_size);
 		uint32_t a;
 		a = itoui(TTTFS_MAGIC_NUMBER); // id de la version
 		memcpy(partition_block->octets,&a,sizeof(uint32_t));
@@ -59,17 +60,33 @@ int main(int argc, char* argv[]){
 		memcpy((partition_block->octets) + sizeof(uint32_t),&a,sizeof(uint32_t));
 		a = itoui(sizes[i]); // taille de la partition
 		memcpy((partition_block->octets) + (2*sizeof(uint32_t)),&a,sizeof(uint32_t));
-		a = itoui(1); // premier block libre : le 1
+		int first = 2 + (int)(0.1*sizes[i]/100); // Premier block libre = 0.1% de taille de partition
+		a = itoui(first); // premier block libre
 		memcpy((partition_block->octets) + (3*sizeof(uint32_t)),&a,sizeof(uint32_t));
-		a = itoui(0); // le nombre de fichiers supportables ??
+		int nb_fic = sizes[i]-first-1;
+		a = itoui(nb_fic); // le nombre de fichiers supportables
 		memcpy((partition_block->octets) + (4*sizeof(uint32_t)),&a,sizeof(uint32_t));
-		a = itoui(0); // le nombre de fichiers actuellement libres ??
+		a = itoui(nb_fic); // le nombre de fichiers actuellement libres
 		memcpy((partition_block->octets) + (5*sizeof(uint32_t)),&a,sizeof(uint32_t));
-		a = itoui(0); // le numero du premier fichier libre du volume ??
+		a = itoui(first); // le numero du premier fichier libre du volume
 		memcpy((partition_block->octets) + (6*sizeof(uint32_t)),&a,sizeof(uint32_t));
-		write_block(id,partition_block,1+(i*previous_partition_size));
+		// Next free file
+		int j;
+		for (j = first; j < sizes[i]; j++){
+		  if (j == sizes[i]-1){
+		    a = itoui(j);
+		  }
+		  else{
+		    a = itoui(j+1);
+		  }
+		  block *partition_sub_block = malloc(sizeof(block));
+		  read_block(id,partition_sub_block,j);
+		  memcpy((partition_sub_block->octets) + (TTTFS_VOLUME_BLOCK_SIZE-sizeof(uint32_t)),&a,sizeof(uint32_t));
+		  write_block(id,partition_sub_block,j);
+		}
 
-		previous_partition_size = sizes[i];
+		write_block(id,partition_block,1+previous_partition_size);
+		previous_partition_size += sizes[i];
             }
             
             write_block(id,block0,0);
@@ -77,7 +94,7 @@ int main(int argc, char* argv[]){
             printf("Partition created !\n");
         }
         else{
-            fprintf(stderr, "Error while creating disk.\n");
+            fprintf(stderr, "Error while reading disk.\n");
             return -1;
         }
     }

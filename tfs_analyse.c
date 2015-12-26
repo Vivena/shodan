@@ -54,7 +54,6 @@ int main(int argc, char* argv[]){
     //recuperation de la taille du disque dur et du nombre de partition
     
     memcpy(&temp,b->octets,sizeof(uint32_t));
-    printf("test avant %i\n",temp);
     size=uitoi(temp);
     printf("Size of the HDD: %i\n",size);
     
@@ -65,10 +64,41 @@ int main(int argc, char* argv[]){
     if (npart!=0) {
         //creation du tableau des tailles de partition
         tpart=malloc(sizeof(int)*npart);
+	int previous_partition_size = 0;
         for (i=0; i<npart; i++) {
             memcpy(&temp,b->octets+((i+2)*sizeof(uint32_t)),sizeof(uint32_t));
             tpart[i]=uitoi(temp);
-            printf("    partition %i : %i blocks\n",i,tpart[i]);
+            printf("\tpartition %i : %i blocks\n",i,tpart[i]);
+
+	    // A mettre en commentaire--------------------------------------------------
+	    block *partition_block = malloc(sizeof(block));
+	    read_block(id,partition_block,1+previous_partition_size);
+	    memcpy(&temp,partition_block->octets,sizeof(uint32_t));
+	    int a;
+	    a=uitoi(temp);
+	    printf("\t\tVersion id : %d\n",a);
+	    memcpy(&temp,(partition_block->octets) + sizeof(uint32_t),sizeof(uint32_t));
+	    a=uitoi(temp);
+	    printf("\t\tSize of a block (octets) : %d\n",a);
+	    memcpy(&temp,(partition_block->octets) + (2*sizeof(uint32_t)),sizeof(uint32_t));
+	    a=uitoi(temp);
+	    printf("\t\tSize of partition : %d\n",a);
+	    memcpy(&temp,(partition_block->octets) + (3*sizeof(uint32_t)),sizeof(uint32_t));
+	    a=uitoi(temp);
+	    printf("\t\tFirst free block : %d\n",a);
+	    memcpy(&temp,(partition_block->octets) + (4*sizeof(uint32_t)),sizeof(uint32_t));
+	    a=uitoi(temp);
+	    printf("\t\tFile max count : %d\n",a);
+	    memcpy(&temp,(partition_block->octets) + (5*sizeof(uint32_t)),sizeof(uint32_t));
+	    a=uitoi(temp);
+	    printf("\t\tFree file count : %d\n",a);
+	    memcpy(&temp,(partition_block->octets) + (6*sizeof(uint32_t)),sizeof(uint32_t));
+	    a=uitoi(temp);
+	    printf("\t\tFirst free file : %d\n",a);
+
+
+	    previous_partition_size += tpart[i];
+	    // ------------------------------------------------------------------------
         }
     }
     

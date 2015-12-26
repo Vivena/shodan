@@ -20,13 +20,13 @@ error write_physical_block(disk_id *id,block *b,uint32_t num){
     uint32_t temp;
     
     lseek(id->id,BLOCK_SIZE*num,SEEK_SET);
-    printf("writing in position %i in HDD\n",num);
+    //printf("writing in position %i in HDD\n",num);
     if((write(id->id,b->octets,sizeof(block)))<0){
         printf("gros pblm\n");
         e.val=-1;
     }
     memcpy(&temp,b->octets,sizeof(uint32_t));
-    printf("finish printing %i\n",temp);
+    //printf("finish printing %i\n",temp);
     return e;
 }
 

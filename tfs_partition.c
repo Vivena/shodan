@@ -33,7 +33,7 @@ int main(int argc, char* argv[]){
             i++;
         }
         
-        // Récupération du disque 
+        // Récupération du disque
         disk_id* id = malloc(sizeof(disk_id));
         error e = start_disk(name,id);
         if (e.val == 0){
@@ -45,48 +45,60 @@ int main(int argc, char* argv[]){
             memcpy((block0->octets)+sizeof(uint32_t),&d,sizeof(uint32_t));
             
             // Ecriture de chaque taille de chaque partition dans le bloc 0
-	    int previous_partition_size = 0;
+            int previous_partition_size = 0;
             for (i = 0; i < nb_partitions; i++){
                 d = itoui(sizes[i]);
                 memcpy((block0->octets)+((i+2)*sizeof(uint32_t)),&d,sizeof(uint32_t));
-
-		// TTTFS description block
-		block *partition_block = malloc(sizeof(block));
-		read_block(id,partition_block,1+previous_partition_size);
-		uint32_t a;
-		a = itoui(TTTFS_MAGIC_NUMBER); // id de la version
-		memcpy(partition_block->octets,&a,sizeof(uint32_t));
-		a = itoui(TTTFS_VOLUME_BLOCK_SIZE); // taille d'un block (1024 octets)
-		memcpy((partition_block->octets) + sizeof(uint32_t),&a,sizeof(uint32_t));
-		a = itoui(sizes[i]); // taille de la partition
-		memcpy((partition_block->octets) + (2*sizeof(uint32_t)),&a,sizeof(uint32_t));
-		int first = 2 + (int)(0.1*sizes[i]/100); // Premier block libre = 0.1% de taille de partition
-		a = itoui(first); // premier block libre
-		memcpy((partition_block->octets) + (3*sizeof(uint32_t)),&a,sizeof(uint32_t));
-		int nb_fic = sizes[i]-first-1;
-		a = itoui(nb_fic); // le nombre de fichiers supportables
-		memcpy((partition_block->octets) + (4*sizeof(uint32_t)),&a,sizeof(uint32_t));
-		a = itoui(nb_fic); // le nombre de fichiers actuellement libres
-		memcpy((partition_block->octets) + (5*sizeof(uint32_t)),&a,sizeof(uint32_t));
-		a = itoui(first); // le numero du premier fichier libre du volume
-		memcpy((partition_block->octets) + (6*sizeof(uint32_t)),&a,sizeof(uint32_t));
-		// Next free file
-		int j;
-		for (j = first; j < sizes[i]; j++){
-		  if (j == sizes[i]-1){
-		    a = itoui(j);
-		  }
-		  else{
-		    a = itoui(j+1);
-		  }
-		  block *partition_sub_block = malloc(sizeof(block));
-		  read_block(id,partition_sub_block,j);
-		  memcpy((partition_sub_block->octets) + (TTTFS_VOLUME_BLOCK_SIZE-sizeof(uint32_t)),&a,sizeof(uint32_t));
-		  write_block(id,partition_sub_block,j);
-		}
-
-		write_block(id,partition_block,1+previous_partition_size);
-		previous_partition_size += sizes[i];
+                
+                // TTTFS description block
+                block *partition_block = malloc(sizeof(block));
+                read_block(id,partition_block,1+previous_partition_size);
+                uint32_t a;
+                a = itoui(TTTFS_MAGIC_NUMBER); // id de la version
+                memcpy(partition_block->octets,&a,sizeof(uint32_t));
+                a = itoui(TTTFS_VOLUME_BLOCK_SIZE); // taille d'un block (1024 octets)
+                memcpy((partition_block->octets) + sizeof(uint32_t),&a,sizeof(uint32_t));
+                a = itoui(sizes[i]); // taille de la partition
+                memcpy((partition_block->octets) + (2*sizeof(uint32_t)),&a,sizeof(uint32_t));
+                int first = 2 + (int)(0.1*sizes[i]/100); // Premier block libre = 0.1% de taille de partition
+                a = itoui(first); // premier block libre
+                memcpy((partition_block->octets) + (3*sizeof(uint32_t)),&a,sizeof(uint32_t));
+                int nb_fic = sizes[i]-first-1;
+                // le nombre de fichiers supportables
+                if (nb_fic<(((0.1*sizes[i]/100)+1)*64)) {// verification du nombre de fichier max
+                    a = itoui(nb_fic);
+                }
+                else{
+                    a = itoui((int)((0.1*sizes[i]/100)+1)*64);
+                }
+                memcpy((partition_block->octets) + (4*sizeof(uint32_t)),&a,sizeof(uint32_t));
+                // le nombre de fichiers actuellement libres
+                if (nb_fic<(((0.1*sizes[i]/100)+1)*64)) {// verification du nombre de fichier max
+                    a = itoui(nb_fic);
+                }
+                else{
+                    a = itoui((int)((0.1*sizes[i]/100)+1)*64);
+                }
+                memcpy((partition_block->octets) + (5*sizeof(uint32_t)),&a,sizeof(uint32_t));
+                a = itoui(first); // le numero du premier fichier libre du volume
+                memcpy((partition_block->octets) + (6*sizeof(uint32_t)),&a,sizeof(uint32_t));
+                // Next free file
+                int j;
+                for (j = first; j < sizes[i]; j++){
+                    if (j == sizes[i]-1){
+                        a = itoui(j);
+                    }
+                    else{
+                        a = itoui(j+1);
+                    }
+                    block *partition_sub_block = malloc(sizeof(block));
+                    read_block(id,partition_sub_block,j);
+                    memcpy((partition_sub_block->octets) + (TTTFS_VOLUME_BLOCK_SIZE-sizeof(uint32_t)),&a,sizeof(uint32_t));
+                    write_block(id,partition_sub_block,j);
+                }
+                
+                write_block(id,partition_block,1+previous_partition_size);
+                previous_partition_size += sizes[i];
             }
             
             write_block(id,block0,0);

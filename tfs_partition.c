@@ -61,9 +61,11 @@ int main(int argc, char* argv[]){
                 a = itoui(sizes[i]); // taille de la partition
                 memcpy((partition_block->octets) + (2*sizeof(uint32_t)),&a,sizeof(uint32_t));
                 int first = 2 + (int)(0.1*sizes[i]/100); // Premier block libre = 0.1% de taille de partition
-                a = itoui(first); // premier block libre
-                memcpy((partition_block->octets) + (3*sizeof(uint32_t)),&a,sizeof(uint32_t));
                 int nb_fic = sizes[i]-first-1;
+                a = itoui(nb_fic);//nombre de blocks libres
+                memcpy((partition_block->octets) + (3*sizeof(uint32_t)),&a,sizeof(uint32_t));
+                a = itoui(first); // premier block libre
+                memcpy((partition_block->octets) + (4*sizeof(uint32_t)),&a,sizeof(uint32_t));
                 // le nombre de fichiers supportables
                 if (nb_fic<(((0.1*sizes[i]/100)+1)*64)) {// verification du nombre de fichier max
                     a = itoui(nb_fic);
@@ -71,7 +73,7 @@ int main(int argc, char* argv[]){
                 else{
                     a = itoui((int)((0.1*sizes[i]/100)+1)*64);
                 }
-                memcpy((partition_block->octets) + (4*sizeof(uint32_t)),&a,sizeof(uint32_t));
+                memcpy((partition_block->octets) + (5*sizeof(uint32_t)),&a,sizeof(uint32_t));
                 // le nombre de fichiers actuellement libres
                 if (nb_fic<(((0.1*sizes[i]/100)+1)*64)) {// verification du nombre de fichier max
                     a = itoui(nb_fic);
@@ -79,9 +81,9 @@ int main(int argc, char* argv[]){
                 else{
                     a = itoui((int)((0.1*sizes[i]/100)+1)*64);
                 }
-                memcpy((partition_block->octets) + (5*sizeof(uint32_t)),&a,sizeof(uint32_t));
-                a = itoui(first); // le numero du premier fichier libre du volume
                 memcpy((partition_block->octets) + (6*sizeof(uint32_t)),&a,sizeof(uint32_t));
+                a = itoui(first); // le numero du premier fichier libre du volume
+                memcpy((partition_block->octets) + (7*sizeof(uint32_t)),&a,sizeof(uint32_t));
                 // Next free file
                 int j;
                 for (j = first; j < sizes[i]; j++){

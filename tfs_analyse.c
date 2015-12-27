@@ -83,16 +83,19 @@ int main(int argc, char* argv[]){
 	    memcpy(&temp,(partition_block->octets) + (2*sizeof(uint32_t)),sizeof(uint32_t));
 	    a=uitoi(temp);
 	    printf("\t\tSize of partition : %d\n",a);
-	    memcpy(&temp,(partition_block->octets) + (3*sizeof(uint32_t)),sizeof(uint32_t));
-	    a=uitoi(temp);
-	    printf("\t\tFirst free block : %d\n",a);
+            memcpy(&temp,(partition_block->octets) + (3*sizeof(uint32_t)),sizeof(uint32_t));
+            a=uitoi(temp);
+            printf("\t\tFree blocks count : %d\n",a);
 	    memcpy(&temp,(partition_block->octets) + (4*sizeof(uint32_t)),sizeof(uint32_t));
 	    a=uitoi(temp);
-	    printf("\t\tFile max count : %d\n",a);
+	    printf("\t\tFirst free block : %d\n",a);
 	    memcpy(&temp,(partition_block->octets) + (5*sizeof(uint32_t)),sizeof(uint32_t));
 	    a=uitoi(temp);
-	    printf("\t\tFree file count : %d\n",a);
+	    printf("\t\tFile max count : %d\n",a);
 	    memcpy(&temp,(partition_block->octets) + (6*sizeof(uint32_t)),sizeof(uint32_t));
+	    a=uitoi(temp);
+	    printf("\t\tFree file count : %d\n",a);
+	    memcpy(&temp,(partition_block->octets) + (7*sizeof(uint32_t)),sizeof(uint32_t));
 	    a=uitoi(temp);
 	    printf("\t\tFirst free file : %d\n",a);
 

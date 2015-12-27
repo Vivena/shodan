@@ -68,7 +68,7 @@ int main(int argc, char* argv[]){
         for (i=0; i<npart; i++) {
             memcpy(&temp,b->octets+((i+2)*sizeof(uint32_t)),sizeof(uint32_t));
             tpart[i]=uitoi(temp);
-            printf("\tpartition %i : %i blocks\n",i,tpart[i]);
+            printf("\tpartition %i : %i blocks\n\n",i,tpart[i]);
             
             // A mettre en commentaire--------------------------------------------------
             block *partition_block = malloc(sizeof(block));
@@ -97,7 +97,7 @@ int main(int argc, char* argv[]){
             printf("\t\tFree file count : %d\n",a);
             memcpy(&temp,(partition_block->octets) + (7*sizeof(uint32_t)),sizeof(uint32_t));
             a=uitoi(temp);
-            printf("\t\tFirst free file : %d\n",a);
+            printf("\t\tFirst free file : %d\n\n",a);
             
             
             previous_partition_size += tpart[i];

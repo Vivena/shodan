@@ -42,7 +42,6 @@ error free_block(disk_id* id, uint32_t num_partition, uint32_t num_free){
 }
 
 // Supprimer un bloc de la liste des blocs libres
-/*
 error fill_block(disk_id* id, uint32_t num_partition, uint32_t num_fill){
   error e;
   e.val=0;
@@ -51,7 +50,7 @@ error fill_block(disk_id* id, uint32_t num_partition, uint32_t num_fill){
   uint32_t temp;
   int a;
   int first_free_block;
-  int new_first_free_block;
+  int next;
 
   // Récupération des blocks
   read_block(id,partition_block,num_partition);
@@ -62,24 +61,25 @@ error fill_block(disk_id* id, uint32_t num_partition, uint32_t num_fill){
   first_free_block = uitoi(temp);
 
   // Gestion des différents cas
-  if (first_free_block == uitoi(num_fill)){ // Si le bloc à occuper est le premier libre de la liste
-    memcpy(&temp,(fill_block->octets) + (TTTFS_VOLUME_BLOCK_SIZE-sizeof(uint32_t)),sizeof(uint32_t));
-    new_first_free_block = uitoi(temp);
-    if (new_first_free_block == uitoi(num_fill)){ // Si plus de bloc libre
-      new_first_free_block = 0;
+  memcpy(&temp,(fill_block->octets) + (TTTFS_VOLUME_BLOCK_SIZE-sizeof(uint32_t)),sizeof(uint32_t));
+  next = uitoi(temp);
+  // Si le bloc à occuper est le premier libre de la liste
+  if (first_free_block == uitoi(num_fill)){
+    if (next == uitoi(num_fill)){ // Si plus de bloc libre
+      next = 0;
     }
-    a = itoui(new_first_free_block);
+    a = itoui(next);
     memcpy((partition_block->octets) + (4*sizeof(uint32_t)),&a,sizeof(uint32_t));
   }
-  a = itoui(first_free_block);
-  memcpy((free_block->octets) + (TTTFS_VOLUME_BLOCK_SIZE-sizeof(uint32_t)),&a,sizeof(uint32_t));
-  a = itoui(num_free);
-  memcpy((partition_block->octets) + (4*sizeof(uint32_t)),&a,sizeof(uint32_t));
+  // Sinon
+  else{
+    
+  }
 
   // Réécriture des blocks
   write_block(id,partition_block,num_partition);
-  write_block(id,free_block,num_free);
+  write_block(id,fill_block,num_fill);
   sync_disk(id);
 
   return e;
-}*/
+}

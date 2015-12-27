@@ -78,23 +78,25 @@ int main(int argc, char* argv[]){
     printf("decalage pour part: %i \n",pemplacement);
     
     //mise à jour de l'entête de la partition
-    memcpy(&temp,(block0->octets) + (3*sizeof(uint32_t)),sizeof(uint32_t));
+    memcpy(&temp,(block0->octets) + ((npart+2)*sizeof(uint32_t)),sizeof(uint32_t));
     a=uitoi(temp);
+    printf("a:%i\n",a);
     
-    if (a-((mf/FILE_TABLE_BLOCK_SIZE)+2)<0) {// file count trop grand
+    first = 2+(mf/FILE_TABLE_BLOCK_SIZE);
+    if (a-first<0) {// file count trop grand
         fprintf(stderr, "Error file_count too big .\n");
         return -1;
     }
     
-    else if(a-((mf/FILE_TABLE_BLOCK_SIZE)+2)<mf){//file count trop grand mais tiens dans la memoire
-        fprintf(stderr, "file_count too big for this partition .\n");
-        mf=a-((mf/FILE_TABLE_BLOCK_SIZE)+2);
-        printf("changing  file_count for %i\n",mf);
+    else if(a-first<mf){//file count trop grand mais tiens dans la memoire
+        fprintf(stderr, "file_count of %i too big for this partition .\n",mf);
+        mf=a-first;
+        printf("changing file_count to %i\n",mf);
     }
 
-        printf("cas n : %i \n",mf/FILE_TABLE_BLOCK_SIZE+1);
+        printf("cas n : \n\t mf/ftb:%i \n\t mf:%i \n\t first:%i \n\t a:%i\n",mf/FILE_TABLE_BLOCK_SIZE+1,mf,first,a);
         read_block(id,block0,pemplacement);
-        first = 2+(mf/FILE_TABLE_BLOCK_SIZE);
+        //first = 2+(mf/FILE_TABLE_BLOCK_SIZE);
         a-=first;
         printf("a : %i\n",a);
         
@@ -123,6 +125,20 @@ int main(int argc, char* argv[]){
         temp = itoui(first); // le numero du premier fichier libre du volume
         memcpy((block0->octets) + (7*sizeof(uint32_t)),&temp,sizeof(uint32_t));
         // Next free file
+    
+    int j;
+    for (j = first; j < a; j++){
+        if (j == a-1){
+            a = itoui(j);
+        }
+        else{
+            a = itoui(j+1);
+        }
+        block *partition_sub_block = malloc(sizeof(block));
+        read_block(id,partition_sub_block,j);
+        memcpy((partition_sub_block->octets) + (TTTFS_VOLUME_BLOCK_SIZE-sizeof(uint32_t)),&a,sizeof(uint32_t));
+        write_block(id,partition_sub_block,j);
+    }
 
     write_block(id,block0,pemplacement);
     sync_disk(id);

@@ -75,12 +75,12 @@ int main(int argc, char* argv[]){
         pemplacement+=uitoi(temp);
     }
     pemplacement++;
-    printf("decalage pour part: %i \n",pemplacement);
+    //printf("decalage pour part: %i \n",pemplacement);
     
     //mise à jour de l'entête de la partition
     memcpy(&temp,(block0->octets) + ((npart+2)*sizeof(uint32_t)),sizeof(uint32_t));
     a=uitoi(temp);
-    printf("a:%i\n",a);
+    //printf("a:%i\n",a);
     
     first = 2+(mf/FILE_TABLE_BLOCK_SIZE);
     if (a-first<0) {// file count trop grand
@@ -94,11 +94,11 @@ int main(int argc, char* argv[]){
         printf("changing file_count to %i\n",mf);
     }
 
-        printf("cas n : \n\t mf/ftb:%i \n\t mf:%i \n\t first:%i \n\t a:%i\n",mf/FILE_TABLE_BLOCK_SIZE+1,mf,first,a);
+        //printf("cas n : \n\t mf/ftb:%i \n\t mf:%i \n\t first:%i \n\t a:%i\n",mf/FILE_TABLE_BLOCK_SIZE+1,mf,first,a);
         read_block(id,block0,pemplacement);
         //first = 2+(mf/FILE_TABLE_BLOCK_SIZE);
         a-=first;
-        printf("a : %i\n",a);
+        //printf("a : %i\n",a);
         
         temp = itoui(a);//nombre de blocks libres
         memcpy((block0->octets) + (3*sizeof(uint32_t)),&temp,sizeof(uint32_t));
@@ -111,7 +111,7 @@ int main(int argc, char* argv[]){
         }
         else{
             temp = itoui(mf);
-            printf("temp: %i\n",temp);
+            //printf("temp: %i\n",temp);
         }
         memcpy((block0->octets) + (5*sizeof(uint32_t)),&temp,sizeof(uint32_t));
         // le nombre de fichiers actuellement libres
@@ -142,6 +142,6 @@ int main(int argc, char* argv[]){
 
     write_block(id,block0,pemplacement);
     sync_disk(id);
-    printf("Partition formated !\n");
+    printf("Partition %i formated !\n",npart);
     return 0;
 }

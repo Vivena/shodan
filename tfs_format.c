@@ -88,7 +88,7 @@ int main(int argc, char* argv[]){
     
     else if(a-((mf/FILE_TABLE_BLOCK_SIZE)+2)<mf){//file count trop grand mais tiens dans la memoire
         fprintf(stderr, "file_count too big for this partition .\n");
-        mf=a-((mf/FILE_TABLE_BLOCK_SIZE)+1);
+        mf=a-((mf/FILE_TABLE_BLOCK_SIZE)+2);
         printf("changing  file_count for %i\n",mf);
     }
         /*read_block(id,block0,pemplacement+1);

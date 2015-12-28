@@ -97,11 +97,6 @@ error free_entry(disk_id* id, uint32_t num_partition, uint32_t entry_index){
   // Récupration du premier block libre
   memcpy(&temp,(partition_block->octets) + (7*sizeof(uint32_t)),sizeof(uint32_t));
   first_free_entry = uitoi(temp);
-  if (first_free_entry == 0){
-    e.val=1;
-    fprintf(stderr, "Error : no free entry.\n");
-    return e;
-  }
 
   // Modification du suivant de la nouvelle entrée libre + premier file libre de partition
   a = itoui(first_free_entry);
@@ -131,6 +126,7 @@ error fill_entry(disk_id* id, uint32_t num_partition, TTTFS_File_Table_Entry ent
   read_block(id,partition_block,num_partition);
   memcpy(&temp,(partition_block->octets) + (7*sizeof(uint32_t)),sizeof(uint32_t));
   first_free_entry = uitoi(temp);
+
   num_block_entry = num_partition+1+(first_free_entry / offset);
   read_block(id,file_table_block,num_block_entry);
 
@@ -139,7 +135,7 @@ error fill_entry(disk_id* id, uint32_t num_partition, TTTFS_File_Table_Entry ent
   memcpy(&temp,(file_table_block->octets) + (((first_free_entry+1) % offset)*FILE_TABLE_BLOCK_SIZE) - sizeof(uint32_t), sizeof(uint32_t));
   next = uitoi(temp);
   if (next == first_free_entry){ // Si plus de bloc libre
-    next = 0;
+    next = -1;
   }
   a = itoui(next);
   memcpy((partition_block->octets) + (7*sizeof(uint32_t)),&a,sizeof(uint32_t));

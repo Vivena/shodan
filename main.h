@@ -31,7 +31,7 @@ exit(1);}
 #define CACHE_MEMORY 8192 // cache de 8MB =2 ^13 blocks peut etre ajusté pour consommé 2% de la mem prise par le HDD
 #define TTTFS_MAGIC_NUMBER 0x31534654
 #define TTTFS_VOLUME_BLOCK_SIZE 1024
-
+#define FILE_TABLE_BLOCK_SIZE 16
 
 
 

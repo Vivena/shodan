@@ -67,36 +67,55 @@ int main(int argc, char* argv[]){
                 a = itoui(first); // premier block libre
                 memcpy((partition_block->octets) + (4*sizeof(uint32_t)),&a,sizeof(uint32_t));
                 // le nombre de fichiers supportables
-                if (nb_fic<(((0.1*sizes[i]/100)+1)*64)) {// verification du nombre de fichier max
+		float formule = ((0.1*sizes[i]/100)+1)*FILE_TABLE_BLOCK_SIZE;
+                if (nb_fic < formule) {// verification du nombre de fichier max
                     a = itoui(nb_fic);
                 }
                 else{
-                    a = itoui((int)((0.1*sizes[i]/100)+1)*64);
+                    a = itoui((int)formule);
                 }
                 memcpy((partition_block->octets) + (5*sizeof(uint32_t)),&a,sizeof(uint32_t));
                 // le nombre de fichiers actuellement libres
-                if (nb_fic<(((0.1*sizes[i]/100)+1)*64)) {// verification du nombre de fichier max
+                if (nb_fic<(((0.1*sizes[i]/100)+1)*16)) {// verification du nombre de fichier max
                     a = itoui(nb_fic);
                 }
                 else{
-                    a = itoui((int)((0.1*sizes[i]/100)+1)*64);
+                    a = itoui((int)formule);
                 }
                 memcpy((partition_block->octets) + (6*sizeof(uint32_t)),&a,sizeof(uint32_t));
-                a = itoui(first); // le numero du premier fichier libre du volume
+                a = itoui(0); // le numero du premier fichier libre du volume
                 memcpy((partition_block->octets) + (7*sizeof(uint32_t)),&a,sizeof(uint32_t));
+
                 // Next free file
-                int j;
+                int j, k = 0, next_entry, offset_table = 0;
+		block *file_table_block = malloc(sizeof(block));
+		read_block(id,file_table_block,2+previous_partition_size);
                 for (j = first; j < sizes[i]; j++){
                     if (j == sizes[i]-1){
                         a = itoui(j);
+			next_entry = itoui(k+(offset_table*FILE_TABLE_BLOCK_SIZE*sizeof(uint32_t)));
                     }
                     else{
                         a = itoui(j+1);
+			next_entry = itoui(k+1+(offset_table*FILE_TABLE_BLOCK_SIZE*sizeof(uint32_t)));
                     }
+		    
+		    // Mise à jour de chaque entrée de file table
+		    if (k == ((FILE_TABLE_BLOCK_SIZE*sizeof(uint32_t))-1)){ // Changement de block de file tab
+		      k = 0;
+		      offset_table++;
+		      read_block(id,file_table_block,2+previous_partition_size+offset_table);
+		    }
+		    memcpy((file_table_block->octets) + (k*FILE_TABLE_BLOCK_SIZE),&next_entry,sizeof(uint32_t));
+		    write_block(id,file_table_block,2+previous_partition_size+offset_table);
+
+		    // Mise à jour de chaque bloc dans la partition
                     block *partition_sub_block = malloc(sizeof(block));
                     read_block(id,partition_sub_block,j);
                     memcpy((partition_sub_block->octets) + (TTTFS_VOLUME_BLOCK_SIZE-sizeof(uint32_t)),&a,sizeof(uint32_t));
-                    write_block(id,partition_sub_block,j);
+		    write_block(id,partition_sub_block,j);
+
+		    k++;
                 }
                 
                 write_block(id,partition_block,1+previous_partition_size);

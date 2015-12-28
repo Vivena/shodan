@@ -12,8 +12,6 @@
 #include "main.h"
 #include "ll.h"
 
-#define FILE_TABLE_BLOCK_SIZE 64
-
 int main(int argc, char* argv[]){
     uint32_t temp;
     int a,i,nb,npart,mf,first,pemplacement=0;

@@ -96,6 +96,16 @@ typedef struct {
   block block;
 } TTTFS_description_block;
 
+typedef struct {
+  int size;
+  int type;
+  int sub_type;
+  int tfs_direct[10];
+  int tfs_indirect1;
+  int tfs_indirect2;
+  int tfs_next_free;
+} TTTFS_File_Table_Entry;
+
 #define SET(m) ((m) & 0x1FFF)
 #define TAG(m) (((m)>>13))
 #define MEM(m,n) ( m <<13 | n)

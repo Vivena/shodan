@@ -41,44 +41,38 @@ error free_block(disk_id* id, uint32_t num_partition, uint32_t num_free){
   return e;
 }
 
-// Supprimer un bloc de la liste des blocs libres
-error fill_block(disk_id* id, uint32_t num_partition, uint32_t num_fill){
+// Supprimer un bloc de la liste des blocs libres = occuper un block de la partition
+error fill_block(disk_id* id, uint32_t num_partition){
   error e;
   e.val=0;
   block *partition_block = malloc(sizeof(block));
   block *fill_block = malloc(sizeof(block));
   uint32_t temp;
-  int a;
-  int first_free_block;
-  int next;
+  int a, first_free_block, next;
 
-  // Récupération des blocks
+  // Récupration des blocks
   read_block(id,partition_block,num_partition);
-  read_block(id,fill_block,num_fill);
-
-  // Récupration du premier block libre
   memcpy(&temp,(partition_block->octets) + (4*sizeof(uint32_t)),sizeof(uint32_t));
   first_free_block = uitoi(temp);
+  if (first_free_block == 0){
+    e.val=1;
+    fprintf(stderr, "Error : no free blocks.\n");
+    return e;
+  }
+  read_block(id,fill_block,first_free_block);
 
-  // Gestion des différents cas
+  // Changement du premier block libre
   memcpy(&temp,(fill_block->octets) + (TTTFS_VOLUME_BLOCK_SIZE-sizeof(uint32_t)),sizeof(uint32_t));
   next = uitoi(temp);
-  // Si le bloc à occuper est le premier libre de la liste
-  if (first_free_block == uitoi(num_fill)){
-    if (next == uitoi(num_fill)){ // Si plus de bloc libre
-      next = 0;
-    }
-    a = itoui(next);
-    memcpy((partition_block->octets) + (4*sizeof(uint32_t)),&a,sizeof(uint32_t));
+  if (next == first_free_block){ // Si plus de bloc libre
+    next = 0;
   }
-  // Sinon
-  else{
-    
-  }
+  a = itoui(next);
+  memcpy((partition_block->octets) + (4*sizeof(uint32_t)),&a,sizeof(uint32_t));
 
   // Réécriture des blocks
   write_block(id,partition_block,num_partition);
-  write_block(id,fill_block,num_fill);
+  write_block(id,fill_block,first_free_block);
   sync_disk(id);
 
   return e;
@@ -90,7 +84,7 @@ error free_entry(disk_id* id, uint32_t num_partition, uint32_t entry_index){
   e.val=0;
   block *partition_block = malloc(sizeof(block));
   block *file_table_block = malloc(sizeof(block));
-  int first_free_block;
+  int first_free_entry;
   int offset = (int)(FILE_TABLE_BLOCK_SIZE*sizeof(uint32_t));
   uint32_t temp;
   int a;
@@ -101,14 +95,19 @@ error free_entry(disk_id* id, uint32_t num_partition, uint32_t entry_index){
   read_block(id,file_table_block,num_block_entry);
 
   // Récupration du premier block libre
-  memcpy(&temp,(partition_block->octets) + (4*sizeof(uint32_t)),sizeof(uint32_t));
-  first_free_block = uitoi(temp);
+  memcpy(&temp,(partition_block->octets) + (7*sizeof(uint32_t)),sizeof(uint32_t));
+  first_free_entry = uitoi(temp);
+  if (first_free_entry == 0){
+    e.val=1;
+    fprintf(stderr, "Error : no free entry.\n");
+    return e;
+  }
 
   // Modification du suivant de la nouvelle entrée libre + premier file libre de partition
-  a = itoui(first_free_block);
-  memcpy((file_table_block->octets) + ((entry_index % offset)*FILE_TABLE_BLOCK_SIZE) - sizeof(uint32_t),&a,sizeof(uint32_t));
+  a = itoui(first_free_entry);
+  memcpy((file_table_block->octets) + (((entry_index+1) % offset)*FILE_TABLE_BLOCK_SIZE) - sizeof(uint32_t),&a,sizeof(uint32_t));
   a = itoui(entry_index);
-  memcpy((partition_block->octets) + (4*sizeof(uint32_t)),&a,sizeof(uint32_t));
+  memcpy((partition_block->octets) + (7*sizeof(uint32_t)),&a,sizeof(uint32_t));
 
   // Réécriture des blocks
   write_block(id,partition_block,num_partition);
@@ -118,9 +117,56 @@ error free_entry(disk_id* id, uint32_t num_partition, uint32_t entry_index){
   return e;
 }
 
-error put_dir_entry(disk_id* id, uint32_t num_partition, TTTFS_File_Table_Entry entry){
+// supprimer une entrée des entrées libres = occuper une entrée
+error fill_entry(disk_id* id, uint32_t num_partition, TTTFS_File_Table_Entry entry){
   error e;
   e.val=0;
+  block *partition_block = malloc(sizeof(block));
+  block *file_table_block = malloc(sizeof(block));
+  int offset = (int)(FILE_TABLE_BLOCK_SIZE*sizeof(uint32_t));
+  uint32_t temp;
+  int first_free_entry, a, next, num_block_entry, entry_position, i, j;
+  
+  // Récupration des blocks
+  read_block(id,partition_block,num_partition);
+  memcpy(&temp,(partition_block->octets) + (7*sizeof(uint32_t)),sizeof(uint32_t));
+  first_free_entry = uitoi(temp);
+  num_block_entry = num_partition+1+(first_free_entry / offset);
+  read_block(id,file_table_block,num_block_entry);
+
+  // Changement de la première entrée libre
+  entry_position = (first_free_entry % offset)*FILE_TABLE_BLOCK_SIZE;
+  memcpy(&temp,(file_table_block->octets) + (((first_free_entry+1) % offset)*FILE_TABLE_BLOCK_SIZE) - sizeof(uint32_t), sizeof(uint32_t));
+  next = uitoi(temp);
+  if (next == first_free_entry){ // Si plus de bloc libre
+    next = 0;
+  }
+  a = itoui(next);
+  memcpy((partition_block->octets) + (7*sizeof(uint32_t)),&a,sizeof(uint32_t));
+
+  // Remplissage
+  i = 0;
+  a = itoui(entry.size);
+  memcpy((file_table_block->octets) + entry_position + (i*sizeof(uint32_t)),&a,sizeof(uint32_t));
+  a = itoui(entry.type); i++;
+  memcpy((file_table_block->octets) + entry_position + (i*sizeof(uint32_t)),&a,sizeof(uint32_t));
+  a = itoui(entry.sub_type); i++;
+  memcpy((file_table_block->octets) + entry_position + (i*sizeof(uint32_t)),&a,sizeof(uint32_t));
+  for (j = 0; j < 10; j++){
+    a = itoui(entry.tfs_direct[j]); i++;
+    memcpy((file_table_block->octets) + entry_position + (i*sizeof(uint32_t)),&a,sizeof(uint32_t));
+  }
+  a = itoui(entry.tfs_indirect1); i++;
+  memcpy((file_table_block->octets) + entry_position + (i*sizeof(uint32_t)),&a,sizeof(uint32_t));
+  a = itoui(entry.tfs_indirect2); i++;
+  memcpy((file_table_block->octets) + entry_position + (i*sizeof(uint32_t)),&a,sizeof(uint32_t));
+  a = itoui(entry.tfs_next_free); i++;
+  memcpy((file_table_block->octets) + entry_position + (i*sizeof(uint32_t)),&a,sizeof(uint32_t));
+
+  // Réécriture des blocks
+  write_block(id,partition_block,num_partition);
+  write_block(id,file_table_block,num_block_entry);
+  sync_disk(id);
 
   return e;
 }

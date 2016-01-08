@@ -245,7 +245,7 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index){
     
     
     //dans direct
-    if (nbtoadd<=10) {
+    if (nbtoadd<10) {
         memcpy(&temp,(file_entry_block->octets) + ((DIRECT+nbtoadd)*sizeof(uint32_t)),sizeof(uint32_t));
         t=uitoi(temp);
         
@@ -404,12 +404,13 @@ error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
     error e;
     e.val=0;
     uint32_t temp;
-    int t,ffb,fsize,offset,num_block_entry,nbtoadd,idir1_block,idir2_block;
+    int t,nbitdel,fsize,offset,num_block_entry,nbofblock,idir1_block,idir2_block;
     
     block *partition_block = malloc(sizeof(block));
     block *file_entry_block = malloc(sizeof(block));
     block *idir1 = malloc(sizeof(block));
     block *idir2 = malloc(sizeof(block));
+    block *file_block = malloc(sizeof(block));
     
     //recuperation du block 0
     read_block(id,partition_block,num_partition);
@@ -439,7 +440,44 @@ error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
     
     //recuperation de la taille du fichier
     memcpy(&temp,(file_entry_block->octets) + (FILE_SIZE*sizeof(uint32_t)),sizeof(uint32_t));
+    fsize=uitoi(temp);
     
+    //recuperation de la taille en block
+    if (fsize==0) {
+        return e;
+    }
+    else{
+        nbofblock=(fsize/BLOCK_SIZE)+1;
+    }
+    
+    //au plus 10 blocks
+    if (nbofblock<10) {
+        memcpy(&temp,(file_entry_block->octets) + ((DIRECT+nbofblock)*sizeof(uint32_t)),sizeof(uint32_t));
+        t=uitoi(temp);
+        if(t==0){
+            memcpy(&temp,(file_entry_block->octets) + ((DIRECT+nbofblock-1)*sizeof(uint32_t)),sizeof(uint32_t));
+            nbofblock--;
+            t=uitoi(temp);
+        }
+        
+        nbitdel=occ_block_size(id,t);
+        fsize-=nbitdel;
+        
+        
+        free_block(id,num_partition, t);
+        memcpy((file_entry_block->octets) + ((DIRECT+nbofblock)*sizeof(uint32_t)),0,sizeof(uint32_t));
+        temp=itoui(fsize);
+        memcpy((file_entry_block->octets) + (FILE_SIZE*sizeof(uint32_t)),&temp,sizeof(uint32_t));
+        
+    }
+    //plus de 10 blocks est moins de 266 blocks
+    else if(nbofblock-10 <=(BLOCK_SIZE/sizeof(uint32_t))*BLOCK_SIZE){
+        
+    }
+    //plus de 266 blocks
+    else{
+        
+    }
     
     free(idir2);
     free(idir1);

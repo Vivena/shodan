@@ -119,6 +119,8 @@
 #endif
 
 #include "main.h"
+#include "ll.h"
+
 const int ib = 1;
 
 uint32_t itoui(int i){
@@ -137,4 +139,20 @@ int uitoi(uint32_t i){
     }
     
     return (int)i;
+}
+
+int occ_block_size(disk_id* id, uint32_t num_partition){
+    int i=0;
+    char t;
+    block *b= malloc(sizeof(block));
+    read_block(id,b,num_partition);
+    for (i=0; i<BLOCK_SIZE; i++) {
+        memcpy(&t,b+i,1);
+        if (t=='\0') {
+            return i;
+        }
+    }
+    
+    return i;
+    
 }

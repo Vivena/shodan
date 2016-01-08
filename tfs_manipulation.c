@@ -81,7 +81,7 @@ error fill_block(disk_id* id, uint32_t num_partition){
     }
     a = itoui(next);
     memcpy((partition_block->octets) + (4*sizeof(uint32_t)),&a,sizeof(uint32_t));
-    
+    memcpy((fill_block->octets) + (TTTFS_VOLUME_BLOCK_SIZE-sizeof(uint32_t)),0,sizeof(uint32_t));
     // Réécriture des blocks
     write_block(id,partition_block,num_partition);
     write_block(id,fill_block,first_free_block);
@@ -398,5 +398,55 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index){
     return e;
 }
 
+
+
+error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
+    error e;
+    e.val=0;
+    uint32_t temp;
+    int t,ffb,fsize,offset,num_block_entry,nbtoadd,idir1_block,idir2_block;
+    
+    block *partition_block = malloc(sizeof(block));
+    block *file_entry_block = malloc(sizeof(block));
+    block *idir1 = malloc(sizeof(block));
+    block *idir2 = malloc(sizeof(block));
+    
+    //recuperation du block 0
+    read_block(id,partition_block,num_partition);
+    
+    //verification du block 0
+    memcpy(&temp,(partition_block->octets) + (MAGIC_NUMBER*sizeof(uint32_t)),sizeof(uint32_t));
+    t=uitoi(temp);
+    if (t != TTTFS_MAGIC_NUMBER) {
+        fprintf(stderr, "Error : Partition is not using the same version as the programme.\n");
+        e.val = -1;
+        return e;
+    }
+    
+    //verification de file_entry
+    memcpy(&temp,(partition_block->octets) + (VOLUME_MAX_FILE_COUNT*sizeof(uint32_t)),sizeof(uint32_t));
+    t=uitoi(temp);
+    if (t<entry_index) {
+        fprintf(stderr, "Error : File_entry too big./n");
+        e.val=-1;
+        return e;
+    }
+    
+    //recuperation du block contenant la file_entry
+    offset = (int)(FILE_TABLE_BLOCK_SIZE*sizeof(uint32_t));
+    num_block_entry = num_partition+1+(entry_index / offset);
+    read_block(id,file_entry_block,num_block_entry);
+    
+    //recuperation de la taille du fichier
+    memcpy(&temp,(file_entry_block->octets) + (FILE_SIZE*sizeof(uint32_t)),sizeof(uint32_t));
+    
+    
+    free(idir2);
+    free(idir1);
+    free(partition_block);
+    free(file_entry_block);
+    
+    return e;
+}
 
 

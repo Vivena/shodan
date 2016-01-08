@@ -447,7 +447,7 @@ error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
         return e;
     }
     else{
-        nbofblock=(fsize/BLOCK_SIZE)+1;
+        nbofblock=(fsize/BLOCK_SIZE);
     }
     
     //au plus 10 blocks
@@ -472,10 +472,36 @@ error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
     }
     //plus de 10 blocks est moins de 266 blocks
     else if(nbofblock-10 <=(BLOCK_SIZE/sizeof(uint32_t))*BLOCK_SIZE){
+        memcpy(&temp,(file_entry_block->octets) + (INDIRECT1*sizeof(uint32_t)),sizeof(uint32_t));
+        idir1_block=uitoi(temp);
+        
+        //pas de block indirect1 alloué
+        if (idir1_block==0) {
+            memcpy(&temp,(file_entry_block->octets) + ((DIRECT+nbofblock-1)*sizeof(uint32_t)),sizeof(uint32_t));
+            nbofblock--;
+            idir1=uitoi(temp);
+        }
+        
+        nbitdel=occ_block_size(id,idir1);
+        fsize-=nbitdel;
+        
+        
+        free_block(id,num_partition, idir1);
+        memcpy((file_entry_block->octets) + ((DIRECT+nbofblock)*sizeof(uint32_t)),0,sizeof(uint32_t));
+        temp=itoui(fsize);
+        memcpy((file_entry_block->octets) + (FILE_SIZE*sizeof(uint32_t)),&temp,sizeof(uint32_t));
         
     }
     //plus de 266 blocks
     else{
+        //recuperation du block indirect2
+        memcpy(&temp,(file_entry_block->octets) + (INDIRECT2*sizeof(uint32_t)),sizeof(uint32_t));
+        idir2_block=uitoi(temp);
+        
+        //pas de block indirect2 alloué
+        if (idir2_block==0) {
+            
+        }
         
     }
     

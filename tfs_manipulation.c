@@ -19,6 +19,9 @@
 #define INDIRECT1 13
 #define INDIRECT2 14
 
+#define NB_DIRECT(m) m-10
+#define NB_IDIR1 TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)
+
 
 
 // Met un block dans la liste des block libres
@@ -416,7 +419,7 @@ error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
     block *file_entry_block = malloc(sizeof(block));
     block *idir1 = malloc(sizeof(block));
     block *idir2 = malloc(sizeof(block));
-    block *file_block = malloc(sizeof(block));
+    
     
     //recuperation du block 0
     read_block(id,partition_block,num_partition);
@@ -497,22 +500,44 @@ error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
             idir1_block=uitoi(temp);*/
         }
         
+        //block indirect1 alloué
+        read_block(id,idir1,idir1_block);
+        //recuperation du dernier block occupé
+        memcpy(&temp,idir1->octets+(sizeof(uint32_t)*(nbofblock-10)),sizeof(uint32_t));
+        t=uitoi(temp);
+        //si le dernier block occupé n'est pas attribué on essail de regarder le block precedent
+        if(t==0){
+            if ((sizeof(uint32_t)*(nbofblock-10))-1==0) {
+                e.val=-1;
+                return e;
+            }
+            memcpy(&temp,(idir1->octets) + (((sizeof(uint32_t)*(nbofblock-10))-1)*sizeof(uint32_t)),sizeof(uint32_t));
+            nbofblock--;
+            t=uitoi(temp);
+        }
+        
+        
+        //calcul de la taille de la file apres
         nbitdel=occ_block_size(id,idir1_block);
         fsize-=nbitdel;
         
+       
+        //supression du dernier block alloué de indirect1
+        free_block(id,num_partition, t);
+        memcpy((file_entry_block->octets) + ((DIRECT+nbofblock)*sizeof(uint32_t)),&temp,sizeof(uint32_t));
         nbofblock--;
-        //supression de infirect1 si besoin
+        //suppression de infirect1 si besoin
         temp=itoui(0);
         if(nbofblock<=10){
             free_block(id,num_partition, idir1_block);
             memcpy((file_entry_block->octets) + (INDIRECT1*sizeof(uint32_t)),&temp,sizeof(uint32_t));
         }
-        free_block(id,num_partition, idir1_block);
-        memcpy((file_entry_block->octets) + ((DIRECT+nbofblock)*sizeof(uint32_t)),&temp,sizeof(uint32_t));
         temp=itoui(fsize);
         memcpy((file_entry_block->octets) + (FILE_SIZE*sizeof(uint32_t)),&temp,sizeof(uint32_t));
         
     }
+    
+    
     //plus de 266 blocks
     else{
         //recuperation du block indirect2
@@ -531,14 +556,50 @@ error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
         read_block(id,idir2,idir2_block);
         
         //recuperation du block indirect1
-        memcpy(&temp,(idir2->octets) + ((((nbofblock-10-(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t))*TTTFS_VOLUME_BLOCK_SIZE))/(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))*sizeof(uint32_t)),sizeof(uint32_t));//a verifier
+        memcpy(&temp,(idir2->octets) + ((NB_DIRECT(nbofblock)-NB_IDIR1)/(NB_IDIR1))*sizeof(uint32_t),sizeof(uint32_t));//a verifier
         idir1_block=uitoi(temp);
         //pas de block indirect1 alloué
+        if (idir1_block==0) {
+            fprintf(stderr,"Error : indirect 1 not allocated.\n");
+            e.val=-1;
+            return e;
+        }
+        //block indirect 1 alloué
+        read_block(id,idir1,idir1_block);
+        
+        
         if (idir1_block==0) {
             memcpy(&temp,(file_entry_block->octets) + ((DIRECT+nbofblock-1)*sizeof(uint32_t)),sizeof(uint32_t));
             nbofblock--;
             idir1_block=uitoi(temp);
         }
+        
+        //recuperation du dernier block occupé
+        memcpy(&temp,idir1->octets+(sizeof(uint32_t)*(nbofblock-10)),sizeof(uint32_t));
+        t=uitoi(temp);
+        //si le dernier block occupé n'est pas attribué on essail de regarder le block precedent
+        if(t==0){
+            if ((sizeof(uint32_t)*((NB_DIRECT(nbofblock)-NB_IDIR1)/(NB_IDIR1)))-1==0) {
+                e.val=-1;
+                return e;
+            }
+            memcpy(&temp,(idir1->octets) + (((sizeof(uint32_t)*((NB_DIRECT(nbofblock)-NB_IDIR1)/(NB_IDIR1)))-1)*sizeof(uint32_t)),sizeof(uint32_t));
+            nbofblock--;
+            t=uitoi(temp);
+        }
+        
+        
+        //calcul de la taille de la file apres
+        nbitdel=occ_block_size(id,idir1_block);
+        fsize-=nbitdel;
+        
+        
+        //supression du dernier block alloué de indirect1
+        free_block(id,num_partition, t);
+        memcpy((file_entry_block->octets) + ((DIRECT+nbofblock)*sizeof(uint32_t)),&temp,sizeof(uint32_t));
+        nbofblock--;
+        
+        //
     
     }
     

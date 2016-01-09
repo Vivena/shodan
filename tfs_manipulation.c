@@ -81,7 +81,8 @@ error fill_block(disk_id* id, uint32_t num_partition){
     }
     a = itoui(next);
     memcpy((partition_block->octets) + (4*sizeof(uint32_t)),&a,sizeof(uint32_t));
-    memcpy((fill_block->octets) + (TTTFS_VOLUME_BLOCK_SIZE-sizeof(uint32_t)),0,sizeof(uint32_t));
+    temp=itoui(0);
+    memcpy((fill_block->octets) + (TTTFS_VOLUME_BLOCK_SIZE-sizeof(uint32_t)),&temp,sizeof(uint32_t));
     // Réécriture des blocks
     write_block(id,partition_block,num_partition);
     write_block(id,fill_block,first_free_block);

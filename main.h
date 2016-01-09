@@ -115,7 +115,7 @@ typedef struct {
 //util.c
 uint32_t itoui(int i);
 int uitoi(uint32_t i);
-
+int occ_block_size(disk_id* id, uint32_t num_partition);
 
     
 

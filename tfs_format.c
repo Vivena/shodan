@@ -20,7 +20,6 @@ int main(int argc, char* argv[]){
     error e;
     block *block0;
     block *block_file_table;
-    TTTFS_File_Table_Entry entry_root;
 
     if (argc < 5){
         fprintf(stderr, "Error : wrong number of arguments.\n");
@@ -152,22 +151,24 @@ int main(int argc, char* argv[]){
     // Création de l'entrée
     block_file_table = malloc(sizeof(block));
     read_block(id,block_file_table,pemplacement+1);
-    entry_root.size = sizeof(uint32_t)+28;
-    entry_root.type = 0;
-    entry_root.sub_type = 1;
-    entry_root.tfs_direct[0] = first;
+    TTTFS_File_Table_Entry* entry_root = malloc(sizeof(TTTFS_File_Table_Entry));
+    entry_root = malloc(sizeof(TTTFS_File_Table_Entry));
+    entry_root->size = sizeof(uint32_t)+28;
+    entry_root->type = 0;
+    entry_root->sub_type = 1;
+    entry_root->tfs_direct[0] = first;
     for (i = 1; i < 10; i++){
-      entry_root.tfs_direct[i] = 0;
+      entry_root->tfs_direct[i] = 0;
     }
-    entry_root.tfs_indirect1 = 0;
-    entry_root.tfs_indirect2 = 0;
+    entry_root->tfs_indirect1 = 0;
+    entry_root->tfs_indirect2 = 0;
 
     // Remplissage
-    if (fill_block(id,npart).val != 0){
+    if (fill_block(id,pemplacement).val != 0){
       fprintf(stderr, "Error while filling block.\n");
       return -1;
     }
-    if (fill_entry(id,npart,entry_root).val != 0){
+    if (fill_entry(id,pemplacement,entry_root).val != 0){
       fprintf(stderr, "Error while writing on File Table.\n");
       return -1;
     }

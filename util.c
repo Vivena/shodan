@@ -156,3 +156,49 @@ int occ_block_size(disk_id* id, uint32_t num_partition){
     return i;
     
 }
+
+/*
+  Prend une chaine de caractère et un séparateur puis
+  remplit un tableau de string
+
+  @res : tableau de string à remplir
+  @str : chaine de caractère à séparer
+  @c_delim : caractère séparateur
+*/
+void str_split(char** res, char* str, char c_delim){
+  
+  size_t count = 0;
+  char* tmp = str;
+  char* last_delim = 0;
+  char delim[2]; // Délimiteur sous la forme d'un string
+  delim[0] = c_delim;
+  delim[1] = '\0';
+
+  // Compte combien d'éléments il faut extraire
+  while (*tmp){
+    if (c_delim == *tmp){
+      count++;
+      last_delim = tmp;
+    }
+    tmp++;
+  }
+  count += last_delim < (str + strlen(str) - 1);
+
+  // On ajoute encore un pour la terminaison du string
+  count++;
+  
+  // Réalocation de res
+  res = realloc(res,count*sizeof(char*));
+  
+  if (res){
+    size_t idx  = 0;
+    char* token = strtok(str, delim);
+    while (token){
+      assert(idx < count);
+      res[idx++] = strdup(token);
+      token = strtok(0, delim);
+    }
+    assert(idx == count - 1);
+    res[idx] = 0;
+  }
+}

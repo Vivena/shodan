@@ -551,4 +551,44 @@ error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
     return e;
 }
 
+/*
+  Sépare un pathname dans un tableau avec toutes les infos 
+  necessaires (disque, volume (si pas HOST), repertoires...
+
+  @res : tableau de string à remplir
+  @path : chemin à évaluer
+*/
+int cut_pathname(char** res, const char* path){
+  int e = 1;
+  char file[8];
+  char path_copy[STRING_MAX_LENGTH];
+  int offset = 7;
+  strncpy(path_copy,path,STRING_MAX_LENGTH);
+
+  // Teste si on a bien "FILE://" au début du path
+  memcpy(file,path_copy,offset);
+  file[offset] = '\0';
+  if (strcmp(file,"FILE://") != 0){
+    fprintf(stderr,"Error pathname syntax, waiting for FILE://");
+    return -1;
+  }
+
+  // Récupération du disk, du volume et du reste sous forme d'un tableau
+  str_split(res, &path_copy[offset],'/');
+
+  // Si c'est un HOST
+  if (strcmp(res[0],"HOST") == 0){
+    e = 0;
+  }
+  else{
+    // Si c'est un disque, on vérifie s'il existe bien
+    if (!access(res[0],F_OK) != -1){
+      fprintf(stderr,"Error pathname, disk %s doesn't exists.\n", res[0]);
+      return -1;
+    }
+  }
+
+  return e;
+}
+
 

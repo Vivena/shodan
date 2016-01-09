@@ -10,6 +10,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdint.h>
+#include <assert.h>
+#include <unistd.h>
 
 #define DEBUG
 
@@ -32,6 +34,7 @@ exit(1);}
 #define TTTFS_MAGIC_NUMBER 0x31534654
 #define TTTFS_VOLUME_BLOCK_SIZE 1024
 #define FILE_TABLE_BLOCK_SIZE 16
+#define STRING_MAX_LENGTH 1024
 
 
 
@@ -116,7 +119,7 @@ typedef struct {
 uint32_t itoui(int i);
 int uitoi(uint32_t i);
 int occ_block_size(disk_id* id, uint32_t num_partition);
-
+void str_split(char** res, char* str, char c_delim);
     
 
 

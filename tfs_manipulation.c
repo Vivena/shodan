@@ -151,7 +151,7 @@ error fill_entry(disk_id* id, uint32_t num_partition, TTTFS_File_Table_Entry ent
     memcpy(&temp,(file_table_block->octets) + (((first_free_entry+1) % offset)*FILE_TABLE_BLOCK_SIZE) - sizeof(uint32_t), sizeof(uint32_t));
     next = uitoi(temp);
     if (next == first_free_entry){ // Si plus de bloc libre
-        next = -1;
+        next = 0;
     }
     a = itoui(next);
     memcpy((partition_block->octets) + (7*sizeof(uint32_t)),&a,sizeof(uint32_t));

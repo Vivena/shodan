@@ -35,7 +35,9 @@ exit(1);}
 #define TTTFS_VOLUME_BLOCK_SIZE 1024
 #define FILE_TABLE_BLOCK_SIZE 16
 #define STRING_MAX_LENGTH 1024
-
+#define FILE_TABLE_OFFSET (FILE_TABLE_BLOCK_SIZE*sizeof(uint32_t))
+#define TFS_DIRECTORIES_SIZE (sizeof(uint32_t) + 28) // un numéro + 28 caractères
+#define TFS_DIRECTORIES_MAX_ENTRIES (TTTFS_VOLUME_BLOCK_SIZE / TFS_DIRECTORIES_SIZE)
 
 
 // --------------------------

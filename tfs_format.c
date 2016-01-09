@@ -19,7 +19,8 @@ int main(int argc, char* argv[]){
     disk_id* id;
     error e;
     block *block0;
-    block *block_file_table;
+    //block *block_file_table;
+    TTTFS_File_Table_Entry* entry_root = malloc(sizeof(TTTFS_File_Table_Entry));
 
     if (argc < 5){
         fprintf(stderr, "Error : wrong number of arguments.\n");
@@ -163,10 +164,8 @@ int main(int argc, char* argv[]){
     first = uitoi(temp);
    
     // Création de l'entrée
-    block_file_table = malloc(sizeof(block));
-    read_block(id,block_file_table,pemplacement+1);
-    TTTFS_File_Table_Entry* entry_root = malloc(sizeof(TTTFS_File_Table_Entry));
-    entry_root = malloc(sizeof(TTTFS_File_Table_Entry));
+    //block_file_table = malloc(sizeof(block));
+    //read_block(id,block_file_table,pemplacement+1);
     entry_root->size = sizeof(uint32_t)+28;
     entry_root->type = 0;
     entry_root->sub_type = 1;
@@ -186,7 +185,7 @@ int main(int argc, char* argv[]){
       fprintf(stderr, "Error while writing on File Table.\n");
       return -1;
     }
-    write_block(id,block_file_table,pemplacement+1);
+    //write_block(id,block_file_table,pemplacement+1);
     char* buf_d = malloc(sizeof(uint32_t)+28);
     read_block(id,block0,first);
     temp = itoui(0);
@@ -195,7 +194,8 @@ int main(int argc, char* argv[]){
     memcpy((block0->octets),buf_d,sizeof(uint32_t)+28);
     strncpy(&buf_d[sizeof(uint32_t)],"..\0",28);
     memcpy((block0->octets)+(sizeof(uint32_t)+28),buf_d,sizeof(uint32_t)+28);
-
+    write_block(id,block0,first);
+    
     sync_disk(id);
     printf("Partition %i formated !\n",npart);
     return 0;

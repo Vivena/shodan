@@ -602,8 +602,15 @@ error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
         nbofblock--;
         
         //suppression si besoin de indirect 1
-        if(1){
-            
+        if(oldnb-(NB_DIRECT(nbofblock)-NB_IDIR1)/(NB_IDIR1)==1){
+            free_block(id,num_partition, idir1_block);
+            memcpy((idir2->octets) + ((NB_DIRECT(nbofblock)-NB_IDIR1)/(NB_IDIR1))*sizeof(uint32_t),&temp,sizeof(uint32_t));
+        }
+        
+        //supression si besoin de indirect 2
+        if ((NB_DIRECT(nbofblock)-NB_IDIR1)/(NB_IDIR1)==0) {
+            free_block(id,num_partition, idir2_block);
+            memcpy((file_entry_block->octets) + (INDIRECT2*sizeof(uint32_t)),&temp,sizeof(uint32_t));
         }
     
     }

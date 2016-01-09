@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall
-EXEC = tfs_create tfs_partition tfs_analyse
+EXEC = tfs_create tfs_partition tfs_analyse tfs_format
 HEADERS = $(wildcard *.h)
 OBJECTS = read_block.o write_block.o start_disk.o sync_disk.o tfs_manipulation.o util.o
 MAIN_OBJECTS = $(EXEC:=.o)
@@ -14,6 +14,9 @@ tfs_partition: tfs_partition.o $(OBJECTS)
 	$(CC) -o $@ $^
 
 tfs_analyse: tfs_analyse.o $(OBJECTS)
+	$(CC) -o $@ $^
+
+tfs_format: tfs_format.o $(OBJECTS)
 	$(CC) -o $@ $^
 
 %.o: %.c $(HEADERS)

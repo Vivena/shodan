@@ -171,7 +171,7 @@ error fill_entry(disk_id* id, uint32_t num_partition, TTTFS_File_Table_Entry * e
     memcpy((file_table_block->octets) + entry_position + (i*sizeof(uint32_t)),&a,sizeof(uint32_t));
     a = itoui(entry->tfs_indirect2); i++;
     memcpy((file_table_block->octets) + entry_position + (i*sizeof(uint32_t)),&a,sizeof(uint32_t));
-    a = itoui(entry->tfs_next_free); i++;
+    a = itoui(next); i++;
     memcpy((file_table_block->octets) + entry_position + (i*sizeof(uint32_t)),&a,sizeof(uint32_t));
     
     // Réécriture des blocks
@@ -602,6 +602,7 @@ error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
         nbofblock--;
         
         //suppression si besoin de indirect 1
+	int oldnb = 0;
         if(oldnb-(NB_DIRECT(nbofblock)-NB_IDIR1)/(NB_IDIR1)==1){
             free_block(id,num_partition, idir1_block);
             memcpy((idir2->octets) + ((NB_DIRECT(nbofblock)-NB_IDIR1)/(NB_IDIR1))*sizeof(uint32_t),&temp,sizeof(uint32_t));

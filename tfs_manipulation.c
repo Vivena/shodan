@@ -240,7 +240,12 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index){
         nbtoadd=0;
     }
     else{
-        nbtoadd=(fsize/BLOCK_SIZE)+1;
+        if (fsize%BLOCK_SIZE==0) {
+            nbtoadd=(fsize/BLOCK_SIZE);
+        }
+        else{
+            nbtoadd=(fsize/BLOCK_SIZE)+1;
+        }
     }
     
     
@@ -265,7 +270,7 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index){
     }
     
     //dans indirect1
-    else if(nbtoadd-10 <=(BLOCK_SIZE/sizeof(uint32_t))*BLOCK_SIZE){
+    else if(nbtoadd-10 >=(BLOCK_SIZE/sizeof(uint32_t))*BLOCK_SIZE){
         //recuperation du block indirecte1
         memcpy(&temp,(file_entry_block->octets) + (INDIRECT1*sizeof(uint32_t)),sizeof(uint32_t));
         idir1_block=uitoi(temp);
@@ -346,7 +351,7 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index){
         read_block(id,idir2,idir2_block);
         
         //recuperation du block indirect1
-        memcpy(&temp,(idir2->octets) + (((nbtoadd-10)/(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))*sizeof(uint32_t)),sizeof(uint32_t));
+        memcpy(&temp,(idir2->octets) + ((((nbtoadd-10-(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t))*TTTFS_VOLUME_BLOCK_SIZE))/(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))*sizeof(uint32_t)),sizeof(uint32_t));//a verifier
         idir1_block=uitoi(temp);
         
         //pas de block indirect1 alloué
@@ -356,7 +361,7 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index){
             if((e=fill_block(id, num_partition)).val!=0){
                 return e;
             }
-            memcpy((idir2->octets) + (((nbtoadd-10)/(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))*sizeof(uint32_t)),&temp,sizeof(uint32_t));
+            memcpy((idir2->octets) + (((nbtoadd-10-(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t))*TTTFS_VOLUME_BLOCK_SIZE))/(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))*sizeof(uint32_t),&temp,sizeof(uint32_t));
             write_block(id,idir2,num_partition);
             
             //verification du nombre de block libres restant
@@ -376,7 +381,7 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index){
         
         //block indirect1 alloué
         read_block(id,idir1,idir1_block);
-        memcpy(&temp,idir1->octets+(sizeof(uint32_t)*((nbtoadd-10)%(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))),sizeof(uint32_t));
+        memcpy(&temp,idir1->octets+(sizeof(uint32_t)*(((nbtoadd-10-(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t))*TTTFS_VOLUME_BLOCK_SIZE))%(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))),sizeof(uint32_t));
         t=uitoi(temp);
         if (t!=0) {
             fprintf(stderr,"Error : Already have an empty block at the end of the file.");
@@ -447,7 +452,12 @@ error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
         return e;
     }
     else{
-        nbofblock=(fsize/BLOCK_SIZE);
+        if (fsize%BLOCK_SIZE==0) {
+            nbofblock=(fsize/BLOCK_SIZE)-1;
+        }
+        else{
+            nbofblock=(fsize/BLOCK_SIZE);
+        }
     }
     
     //au plus 10 blocks
@@ -471,22 +481,30 @@ error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
         
     }
     //plus de 10 blocks est moins de 266 blocks
-    else if(nbofblock-10 <=(BLOCK_SIZE/sizeof(uint32_t))*BLOCK_SIZE){
+    else if(nbofblock-10 >=(BLOCK_SIZE/sizeof(uint32_t))*BLOCK_SIZE){
         memcpy(&temp,(file_entry_block->octets) + (INDIRECT1*sizeof(uint32_t)),sizeof(uint32_t));
         idir1_block=uitoi(temp);
         
         //pas de block indirect1 alloué
         if (idir1_block==0) {
-            memcpy(&temp,(file_entry_block->octets) + ((DIRECT+nbofblock-1)*sizeof(uint32_t)),sizeof(uint32_t));
+            fprintf(stderr,"Error : Block indirect 1 not allocated");
+            e.val=-1;
+            return e;
+           /* memcpy(&temp,(file_entry_block->octets) + ((DIRECT+nbofblock-1)*sizeof(uint32_t)),sizeof(uint32_t));
             nbofblock--;
-            idir1=uitoi(temp);
+            idir1_block=uitoi(temp);*/
         }
         
-        nbitdel=occ_block_size(id,idir1);
+        nbitdel=occ_block_size(id,idir1_block);
         fsize-=nbitdel;
         
-        
-        free_block(id,num_partition, idir1);
+        nbofblock--;
+        //supression de infirect1 si besoin
+        if(nbofblock<=10){
+            free_block(id,num_partition, idir1_block);
+            memcpy((file_entry_block->octets) + (INDIRECT1*sizeof(uint32_t)),0,sizeof(uint32_t));
+        }
+        free_block(id,num_partition, idir1_block);
         memcpy((file_entry_block->octets) + ((DIRECT+nbofblock)*sizeof(uint32_t)),0,sizeof(uint32_t));
         temp=itoui(fsize);
         memcpy((file_entry_block->octets) + (FILE_SIZE*sizeof(uint32_t)),&temp,sizeof(uint32_t));
@@ -500,10 +518,27 @@ error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
         
         //pas de block indirect2 alloué
         if (idir2_block==0) {
-            
+            fprintf(stderr,"Error : Block indirect 2 not allocated");
+            e.val=-1;
+            return e;
+            //on part du principe que il n'y a pas d'erreur
         }
         
+        //block indirect2 alloué
+        read_block(id,idir2,idir2_block);
+        
+        //recuperation du block indirect1
+        memcpy(&temp,(idir2->octets) + ((((nbofblock-10-(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t))*TTTFS_VOLUME_BLOCK_SIZE))/(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))*sizeof(uint32_t)),sizeof(uint32_t));//a verifier
+        idir1_block=uitoi(temp);
+        //pas de block indirect1 alloué
+        if (idir1_block==0) {
+            memcpy(&temp,(file_entry_block->octets) + ((DIRECT+nbofblock-1)*sizeof(uint32_t)),sizeof(uint32_t));
+            nbofblock--;
+            idir1_block=uitoi(temp);
+        }
+    
     }
+    
     
     free(idir2);
     free(idir1);

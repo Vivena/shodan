@@ -199,6 +199,6 @@ void str_split(char** res, char* str, char c_delim){
       token = strtok(0, delim);
     }
     assert(idx == count - 1);
-    res[idx] = 0;
+    res[idx] = "\0";
   }
 }

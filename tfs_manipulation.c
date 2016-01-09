@@ -129,7 +129,7 @@ error free_entry(disk_id* id, uint32_t num_partition, uint32_t entry_index){
 }
 
 // supprimer une entrée des entrées libres = occuper une entrée
-error fill_entry(disk_id* id, uint32_t num_partition, TTTFS_File_Table_Entry entry){
+error fill_entry(disk_id* id, uint32_t num_partition, TTTFS_File_Table_Entry * entry){
     error e;
     e.val=0;
     block *partition_block = malloc(sizeof(block));

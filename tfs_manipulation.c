@@ -158,21 +158,21 @@ error fill_entry(disk_id* id, uint32_t num_partition, TTTFS_File_Table_Entry * e
     
     // Remplissage
     i = 0;
-    a = itoui(entry.size);
+    a = itoui(entry->size);
     memcpy((file_table_block->octets) + entry_position + (i*sizeof(uint32_t)),&a,sizeof(uint32_t));
-    a = itoui(entry.type); i++;
+    a = itoui(entry->type); i++;
     memcpy((file_table_block->octets) + entry_position + (i*sizeof(uint32_t)),&a,sizeof(uint32_t));
-    a = itoui(entry.sub_type); i++;
+    a = itoui(entry->sub_type); i++;
     memcpy((file_table_block->octets) + entry_position + (i*sizeof(uint32_t)),&a,sizeof(uint32_t));
     for (j = 0; j < 10; j++){
-        a = itoui(entry.tfs_direct[j]); i++;
+        a = itoui(entry->tfs_direct[j]); i++;
         memcpy((file_table_block->octets) + entry_position + (i*sizeof(uint32_t)),&a,sizeof(uint32_t));
     }
-    a = itoui(entry.tfs_indirect1); i++;
+    a = itoui(entry->tfs_indirect1); i++;
     memcpy((file_table_block->octets) + entry_position + (i*sizeof(uint32_t)),&a,sizeof(uint32_t));
-    a = itoui(entry.tfs_indirect2); i++;
+    a = itoui(entry->tfs_indirect2); i++;
     memcpy((file_table_block->octets) + entry_position + (i*sizeof(uint32_t)),&a,sizeof(uint32_t));
-    a = itoui(entry.tfs_next_free); i++;
+    a = itoui(entry->tfs_next_free); i++;
     memcpy((file_table_block->octets) + entry_position + (i*sizeof(uint32_t)),&a,sizeof(uint32_t));
     
     // Réécriture des blocks

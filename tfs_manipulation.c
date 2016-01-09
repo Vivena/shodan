@@ -271,7 +271,7 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index){
     }
     
     //dans indirect1
-    else if(nbtoadd-10 >=(BLOCK_SIZE/sizeof(uint32_t))*BLOCK_SIZE){
+    else if(nbtoadd-10 <=(BLOCK_SIZE/sizeof(uint32_t))*BLOCK_SIZE){
         //recuperation du block indirecte1
         memcpy(&temp,(file_entry_block->octets) + (INDIRECT1*sizeof(uint32_t)),sizeof(uint32_t));
         idir1_block=uitoi(temp);
@@ -483,7 +483,7 @@ error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
         
     }
     //plus de 10 blocks est moins de 266 blocks
-    else if(nbofblock-10 >=(BLOCK_SIZE/sizeof(uint32_t))*BLOCK_SIZE){
+    else if(nbofblock-10 <=(BLOCK_SIZE/sizeof(uint32_t))*BLOCK_SIZE){
         memcpy(&temp,(file_entry_block->octets) + (INDIRECT1*sizeof(uint32_t)),sizeof(uint32_t));
         idir1_block=uitoi(temp);
         
@@ -582,7 +582,7 @@ int cut_pathname(char** res, const char* path){
   }
   else{
     // Si c'est un disque, on vérifie s'il existe bien
-    if (!access(res[0],F_OK) != -1){
+    if (access(res[0],F_OK) == -1){
       fprintf(stderr,"Error pathname, disk %s doesn't exists.\n", res[0]);
       return -1;
     }

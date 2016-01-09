@@ -476,7 +476,8 @@ error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
         
         
         free_block(id,num_partition, t);
-        memcpy((file_entry_block->octets) + ((DIRECT+nbofblock)*sizeof(uint32_t)),0,sizeof(uint32_t));
+        temp=itoui(0);
+        memcpy((file_entry_block->octets) + ((DIRECT+nbofblock)*sizeof(uint32_t)),&temp,sizeof(uint32_t));
         temp=itoui(fsize);
         memcpy((file_entry_block->octets) + (FILE_SIZE*sizeof(uint32_t)),&temp,sizeof(uint32_t));
         
@@ -501,12 +502,13 @@ error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
         
         nbofblock--;
         //supression de infirect1 si besoin
+        temp=itoui(0);
         if(nbofblock<=10){
             free_block(id,num_partition, idir1_block);
-            memcpy((file_entry_block->octets) + (INDIRECT1*sizeof(uint32_t)),0,sizeof(uint32_t));
+            memcpy((file_entry_block->octets) + (INDIRECT1*sizeof(uint32_t)),&temp,sizeof(uint32_t));
         }
         free_block(id,num_partition, idir1_block);
-        memcpy((file_entry_block->octets) + ((DIRECT+nbofblock)*sizeof(uint32_t)),0,sizeof(uint32_t));
+        memcpy((file_entry_block->octets) + ((DIRECT+nbofblock)*sizeof(uint32_t)),&temp,sizeof(uint32_t));
         temp=itoui(fsize);
         memcpy((file_entry_block->octets) + (FILE_SIZE*sizeof(uint32_t)),&temp,sizeof(uint32_t));
         

@@ -120,11 +120,12 @@ int main(int argc, char* argv[]){
       temp = itoui(mf);
     }
     memcpy((block0->octets) + (6*sizeof(uint32_t)),&temp,sizeof(uint32_t));
-    temp = itoui(first); // le numero du premier fichier libre du volume
+    temp = itoui(0); // le numero du premier fichier libre du volume
     memcpy((block0->octets) + (7*sizeof(uint32_t)),&temp,sizeof(uint32_t));
     // Next free file
     
     int j;
+    block *partition_sub_block = malloc(sizeof(block));
     for (j = first; j < a; j++){
       if (j == a-1){
 	a = itoui(j);
@@ -132,14 +133,27 @@ int main(int argc, char* argv[]){
       else{
 	a = itoui(j+1);
       }
-      block *partition_sub_block = malloc(sizeof(block));
       read_block(id,partition_sub_block,j);
       memcpy((partition_sub_block->octets) + (TTTFS_VOLUME_BLOCK_SIZE-sizeof(uint32_t)),&a,sizeof(uint32_t));
       write_block(id,partition_sub_block,j);
     }
     write_block(id,block0,pemplacement);
-
-
+    
+    for (i = 0; i < (mf/FILE_TABLE_BLOCK_SIZE); i++){
+      if (i == (mf/FILE_TABLE_BLOCK_SIZE)-1){
+	a = itoui(i);
+      }
+      else{
+	a = itoui(i+1);
+      }
+      // Pour chaque bloc...
+      read_block(id,partition_sub_block,pemplacement+1+i);
+      for (j = 0; j < FILE_TABLE_BLOCK_SIZE; j++){
+	memcpy((partition_sub_block->octets) + ((j+1)*sizeof(uint32_t))-sizeof(uint32_t),&a,sizeof(uint32_t));
+      }
+      write_block(id,partition_sub_block,pemplacement+1+i);
+    }
+    
 
     // ---------------- Construction du répertoire racine
 
@@ -147,7 +161,7 @@ int main(int argc, char* argv[]){
     read_block(id,block0,pemplacement);
     memcpy(&temp,(block0->octets)+(4*sizeof(uint32_t)),sizeof(uint32_t));
     first = uitoi(temp);
-    
+   
     // Création de l'entrée
     block_file_table = malloc(sizeof(block));
     read_block(id,block_file_table,pemplacement+1);

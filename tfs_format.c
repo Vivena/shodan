@@ -145,7 +145,7 @@ int main(int argc, char* argv[]){
 
     // On récuppère le numéro de bloc qui sera occupé par la racine
     read_block(id,block0,pemplacement);
-    memcpy(&temp,block0->octets,sizeof(uint32_t));
+    memcpy(&temp,(block0->octets)+(4*sizeof(uint32_t)),sizeof(uint32_t));
     first = uitoi(temp);
     
     // Création de l'entrée
@@ -181,7 +181,6 @@ int main(int argc, char* argv[]){
     memcpy((block0->octets),buf_d,sizeof(uint32_t)+28);
     strncpy(&buf_d[sizeof(uint32_t)],"..\0",28);
     memcpy((block0->octets)+(sizeof(uint32_t)+28),buf_d,sizeof(uint32_t)+28);
-
 
     sync_disk(id);
     printf("Partition %i formated !\n",npart);

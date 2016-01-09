@@ -145,7 +145,6 @@ error fill_entry(disk_id* id, uint32_t num_partition, TTTFS_File_Table_Entry * e
     
     num_block_entry = num_partition+1+(first_free_entry / offset);
     read_block(id,file_table_block,num_block_entry);
-    
     // Changement de la première entrée libre
     entry_position = (first_free_entry % offset)*FILE_TABLE_BLOCK_SIZE;
     memcpy(&temp,(file_table_block->octets) + (((first_free_entry+1) % offset)*FILE_TABLE_BLOCK_SIZE) - sizeof(uint32_t), sizeof(uint32_t));

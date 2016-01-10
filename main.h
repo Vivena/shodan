@@ -20,36 +20,38 @@
  * Utilisez la commande \code make clean \endcode
  * Attention, ça n'enlèvera pas les disques créés. Il faut les enlever vous même.
  *
- * \section section2 Liste des commandes 
+ * \section section2 Liste des commandes réalisées 
  * 
- * Pour les commandes suivantes, nous utilisons l'API de bas niveau (dans ll.h).
+ * Pour les commandes suivantes, nous utilisons l'API de bas niveau (dans ll.h). Le code source de ces fonctions est disponible dans les fichiers portant leur nom (un fichier par fonction, sauf write et read mélangés avec le physical).
  *
- * \code tfs_create -s size [name]\endcode
+ * \code ./tfs_create -s size [name]\endcode
  *  
- * Voir la documentation de tfs_create.c.
+ * Le code source se trouve dans tfs_create.c.
  *
- * \code tfs_partition -p size [-p size]... [name]\endcode
+ * \code ./tfs_partition -p size [-p size]... [name]\endcode
  *
- * Voir la documentation de tfs_partition.c.
+ * Le code source se trouve dans tfs_partition.c.
  *
- * \code tfs_analyse [name]\endcode
+ * \code ./tfs_analyse [name]\endcode
  *
- * Voir la documentation de tfs_analyse.c (quelques affichages supplémentaires par rapport au sujet).
+ *  Le code source se trouve dans tfs_analyse.c (quelques affichages supplémentaires par rapport au sujet).
  *
  * --------------------------------------------------------------------------------------------
  *
- * Les commandes suivantes utilisent des fonctions diverses d'opérations de bas-niveau sur les volumes, elles sont stockées dans la bibliothèque ll_volume.h.
+ * Les commandes suivantes utilisent des fonctions diverses d'opérations de bas-niveau sur les volumes, les en-têtes  sont stockées dans la bibliothèque ll_volume.h, et le code source dans tfs_manipulation.c.
  *
- * \code tfs_format -p partition -mf file_count [disk] \endcode
+ * \code ./tfs_format -p partition -mf file_count [disk] \endcode
  *
- * Voir la documentation de tfs_format.c.
+ * Le code source se trouve dans tfs_format.c.
+ *
+ * \code ./tfs_mkdir path \endcode
+ *
+ * Le code source se trouve dans tfs_mkdir.c.
  *
  *
+ * \section section3 Liste des structures
  *
- *
- *
- *
- *
+ * Voir la liste <a href="annotated.html">ICI</a>.
  */
 
 #ifndef main_h
@@ -94,9 +96,14 @@ exit(1);}
 // --------------------------
 // Définition des structures
 
+/**
+ * \brief Un block de 1024 octets.
+ * \details 
+ *
+ * \param octets Le tableau de caractères contentant les 1024 octets
+ */
 typedef struct {
     char octets[BLOCK_SIZE]; // tableau contenant chaque octet
-    int free; // nombre d'octets disponibles dans le block
 } block;
 
 /*
@@ -127,31 +134,63 @@ dans notre cas, on n'a pas acces au O, on se contente de la structure
  
 */
 
-
-typedef struct{// correspond à une entrée du cache
-    uint32_t TAG;// Voir au dessus
+/**
+ * \brief Un block du cacheUne entrée du cache.
+ * \details 
+ *
+ * \param TAG 
+ * \param data Les données du cache.
+ * \param valide Pour savoir si l'information est encore valide.
+ */
+typedef struct{
+    uint32_t TAG;
     block *data;
-    int valide;// savoir si l'information est encore valide
+    int valide;
 }cache_block;
 
+/**
+ * \brief Le cache.
+ * \details 
+ *
+ * \param cmemory Liste d'entrées du cache.
+ */
 typedef struct{
     cache_block  *cmemory;
 }cache;
 
-
+/**
+ * \brief Erreur détaillée
+ * \details 
+ *
+ * \param val Valeur de l'erreur.
+ */
 typedef struct {
     int val;
 } error;
 
+/**
+ * \brief Identifiant du disque + cache
+ * \details 
+ *
+ * \param id L'identifiant en question.
+ * \param cache Pointeur vers le cache.
+ */
 typedef struct {
     int id;
     cache *cache;
 } disk_id;
 
-typedef struct {
-  block block;
-} TTTFS_description_block;
-
+/**
+ * \brief Description d'une entrée d'un File Table
+ * \details 
+ *
+ * \param size Taille du fichier.
+ * \param type Type de fichier (répertoire/fichier).
+ * \param sub_type Sous-type du fichier (=0).
+ * \param tfs_direct Les 10 premiers blocks direct du fichier.
+ * \param tfs_indirect1 Le block indirect 1.
+ * \param tfs_indirect2 Le block indirect 2.
+ */
 typedef struct {
   int size;
   int type;
@@ -159,15 +198,22 @@ typedef struct {
   int tfs_direct[10];
   int tfs_indirect1;
   int tfs_indirect2;
-  int tfs_next_free;
 } TTTFS_File_Table_Entry;
 
-
+/**
+ * \brief Information supplémentaires sur un fichier ouvert.
+ * \details 
+ *
+ * \param ninode Inode du fichier ouvert (numéro dans File Table).
+ * \param pointeur Pointeur.
+ * \param flags Les flags.
+ * \param host Host.
+ */
 typedef struct{
     int ninode;
     int pointeur;
     int flags;
-    char host[64];
+    disk_id* host;
 } file_descriptor;
 
 extern file_descriptor fdtable[1024];

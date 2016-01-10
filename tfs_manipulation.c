@@ -25,7 +25,16 @@
 
 
 
-// Met un block dans la liste des block libres
+/**
+ * \brief Met un block dans la liste des block libres
+ * \details Modifie la valeur du first_free_block dans la description de la partition (devient le numéro de block de celui à libérer) et la valeur du next du block à libérer est le first_free_block qui se trouvait dans la partition.
+ *          
+ *          
+ * \param id L'identifiant du disque.
+ * \param num_partition Numero du block où se trouve le début de la partition.
+ * \param num_free Numero du block à libérer
+ * \return 0 si tout se passe bien, -1 sinon.
+ */
 error free_block(disk_id* id, uint32_t num_partition, uint32_t num_free){
     error e;
     e.val=0;
@@ -57,7 +66,16 @@ error free_block(disk_id* id, uint32_t num_partition, uint32_t num_free){
     return e;
 }
 
-// Supprimer un bloc de la liste des blocs libres = occuper un block de la partition
+
+/**
+ * \brief Supprime un bloc de la liste des blocs libres
+ * \details Modifie la valeur du first_free_block dans la description de la partition (devient le next de first_free_block).
+ *          
+ *          
+ * \param id L'identifiant du disque.
+ * \param num_partition Numero du block où se trouve le début de la partition.
+ * \return 0 si tout se passe bien, -1 sinon.
+ */
 error fill_block(disk_id* id, uint32_t num_partition){
     error e;
     e.val=0;
@@ -95,6 +113,16 @@ error fill_block(disk_id* id, uint32_t num_partition){
     return e;
 }
 
+/**
+ * \brief Met une entrée de répertoire dans la liste des entrées libres
+ * \details Modifie la valeur du first_free_file dans la description de la partition (devient le next de l'entrée) et le next de l'entrée est le first_free_file qui se trouvait dans la partition.
+ *          
+ *          
+ * \param id L'identifiant du disque.
+ * \param num_partition Numero du block où se trouve le début de la partition.
+ * \param entry_index Numero de l'entrée dans le File Table.
+ * \return 0 si tout se passe bien, -1 sinon.
+ */
 // mettre une entrée de répertoire dans la liste des entrées libres = rendre une entrée libre
 error free_entry(disk_id* id, uint32_t num_partition, uint32_t entry_index){
     error e;
@@ -129,7 +157,16 @@ error free_entry(disk_id* id, uint32_t num_partition, uint32_t entry_index){
     return e;
 }
 
-// supprimer une entrée des entrées libres = occuper une entrée
+/**
+ * \brief Supprime une entrée des entrées libres
+ * \details Modifie la valeur du first_free_file dans la description de la partition (devient le next de first_free_file), puis ajoute l'entrée au File Table.
+ *          
+ *          
+ * \param id L'identifiant du disque.
+ * \param num_partition Numero du block où se trouve le début de la partition.
+ * \param entry Entrée à ajouter dans le File Table.
+ * \return 0 si tout se passe bien, -1 sinon.
+ */
 error fill_entry(disk_id* id, uint32_t num_partition, TTTFS_File_Table_Entry * entry){
     error e;
     e.val=0;
@@ -184,7 +221,16 @@ error fill_entry(disk_id* id, uint32_t num_partition, TTTFS_File_Table_Entry * e
 }
 
 
-
+/**
+ * \brief 
+ * \details 
+ *          
+ *          
+ * \param id L'identifiant du disque.
+ * \param num_partition Numero du block où se trouve le début de la partition.
+ * \param adresse 
+ * \return 0 si tout se passe bien, -1 sinon.
+ */
 error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index,int *adresse){
     error e;
     e.val=0;
@@ -410,8 +456,16 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index,int 
     return e;
 }
 
-
-
+/**
+ * \brief 
+ * \details 
+ *          
+ *          
+ * \param id L'identifiant du disque.
+ * \param num_partition Numero du block où se trouve le début de la partition.
+ * \param entry_index Numero de l'entrée dans le File Table.
+ * \return 0 si tout se passe bien, -1 sinon.
+ */
 error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
     error e;
     e.val=0;
@@ -626,6 +680,16 @@ error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
     return e;
 }
 
+/**
+ * \brief 
+ * \details 
+ *          
+ *          
+ * \param id L'identifiant du disque.
+ * \param num_partition Numero du block où se trouve le début de la partition.
+ * \param entry_index Numero de l'entrée dans le File Table.
+ * \return 0 si tout se passe bien, -1 sinon.
+ */
 error wipe_file(disk_id* id, uint32_t num_partition,int entry_index){
     error e;
     e.val=0;
@@ -675,6 +739,17 @@ error wipe_file(disk_id* id, uint32_t num_partition,int entry_index){
     return e;
 }
 
+/**
+ * \brief 
+ * \details 
+ *          
+ *          
+ * \param id L'identifiant du disque.
+ * \param num_partition Numero du block où se trouve le début de la partition.
+ * \param entry_index Numero de l'entrée dans le File Table.
+ * \param entry_index Numero du block.
+ * \return 0 si tout se passe bien, -1 sinon.
+ */
 int have_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_block){
     uint32_t temp;
     int t=1,offset,num_block_entry,idir1_block=0,idir2_block=0;
@@ -815,7 +890,16 @@ int have_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_
     return -1;
 }
 
-
+/**
+ * \brief 
+ * \details 
+ *          
+ *          
+ * \param id L'identifiant du disque.
+ * \param num_partition Numero du block où se trouve le début de la partition.
+ * \param entry_index Numero de l'entrée dans le File Table.
+ * \return 0 si tout se passe bien, -1 sinon.
+ */
 int get_last_block(disk_id* id, uint32_t num_partition,int entry_index){
     
     
@@ -840,13 +924,15 @@ int get_last_block(disk_id* id, uint32_t num_partition,int entry_index){
 }*/
 
 
-/*
-  Sépare un pathname dans un tableau avec toutes les infos
-  necessaires (disque, volume (si pas HOST), repertoires...
-
-  @res : tableau de string à remplir
-  @path : chemin à évaluer
-*/
+/**
+ * \brief Découpe un path
+ * \details Sépare un pathname dans un tableau avec toutes les infos
+ *          necessaires (disque, volume (si pas HOST), repertoires...
+ *                 
+ * \param res Tableau de string à remplir
+ * \param path Chemin à évaluer
+ * \return 0 si tout se passe bien, -1 sinon.
+ */
 int cut_pathname(char** res, const char* path){
   int e = 1;
   char file[8];
@@ -880,6 +966,16 @@ int cut_pathname(char** res, const char* path){
   return e;
 }
 
+/**
+ * \brief Teste si un répertoire existe
+ * \details Teste si le nom d'un fichier/répertoire apparait dans le dossier courant indiqué, et donne le numéro d'entrée du fichier s'il existe.
+ *                 
+ * \param id L'identifiant du disque.
+ * \param current_dir Addresse du répertoire courant.
+ * \param pemplacement Numero du block où se trouve le début de la partition.
+ * \param name Nom du répertoire don't il faut tester l'existence.
+ * \return Vrai si le répertoire existe, faux sinon.
+ */
 int is_in_directory(disk_id* id, int* current_dir, int pemplacement, char* name){
   int exists = 0, index, index_entry, i, j, temp;
   char dir_name[TFS_DIRECTORIES_SIZE];

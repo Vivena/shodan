@@ -167,7 +167,7 @@ typedef struct{
     int ninode;
     int pointeur;
     int flags;
-    
+    char host[64];
 } file_descriptor;
 
 extern file_descriptor fdtable[1024];

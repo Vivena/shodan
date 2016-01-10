@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall
 EXEC = tfs_create tfs_partition tfs_analyse tfs_format tfs_mkdir
 HEADERS = $(wildcard *.h)
-OBJECTS = read_block.o write_block.o start_disk.o sync_disk.o tfs_manipulation.o tfs_open.o tfs_close.o util.o
+OBJECTS = read_block.o write_block.o start_disk.o stop_disk.o sync_disk.o tfs_manipulation.o tfs_open.o tfs_close.o util.o
 MAIN_OBJECTS = $(EXEC:=.o)
 
 all: $(EXEC)

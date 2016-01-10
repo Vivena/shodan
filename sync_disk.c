@@ -10,6 +10,14 @@
 #include "main.h"
 #include "ll.h"
 
+
+/**
+ * \brief Synchronise le disque.
+ * \details Equivalent d'un flush.
+ *           
+ * \param id L'identifiant du disque.
+ * \return Un error à valeur 0.
+ */
 error sync_disk(disk_id *id){
     error e;
     e.val=0;

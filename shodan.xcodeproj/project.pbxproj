@@ -17,6 +17,11 @@
 		F8A297971C42C9FF00356D68 /* tfs_format.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tfs_format.c; sourceTree = "<group>"; };
 		F8A297981C42CA0200356D68 /* tfs_close.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tfs_close.c; sourceTree = "<group>"; };
 		F8A297991C42CA0600356D68 /* tfs_analyse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tfs_analyse.c; sourceTree = "<group>"; };
+		F8A2979A1C42CD4600356D68 /* stop_disk.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = stop_disk.c; sourceTree = "<group>"; };
+		F8A2979B1C42CEC800356D68 /* tfs_write.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tfs_write.c; sourceTree = "<group>"; };
+		F8A2979C1C42E5C900356D68 /* ll_volume.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ll_volume.h; sourceTree = "<group>"; };
+		F8A2979D1C42E5CF00356D68 /* rewinddir.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = rewinddir.c; sourceTree = "<group>"; };
+		F8A2979E1C42E5D500356D68 /* closedir.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = closedir.c; sourceTree = "<group>"; };
 		F8C77F5B1C08496F00396D57 /* tfs_create.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tfs_create.c; sourceTree = "<group>"; };
 		F8C77F5C1C08496F00396D57 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		F8C77F5F1C0859D900396D57 /* start_disk.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = start_disk.c; sourceTree = "<group>"; };
@@ -34,12 +39,17 @@
 			children = (
 				F85D0E2A1C0A169D00B8909E /* ll.h */,
 				F85D0E291C0A168800B8909E /* main.h */,
+				F8A2979A1C42CD4600356D68 /* stop_disk.c */,
+				F8A2979B1C42CEC800356D68 /* tfs_write.c */,
 				F8C77F631C08720100396D57 /* util.c */,
 				F8C77F5F1C0859D900396D57 /* start_disk.c */,
 				F8A297991C42CA0600356D68 /* tfs_analyse.c */,
 				F8A297981C42CA0200356D68 /* tfs_close.c */,
 				F8A297971C42C9FF00356D68 /* tfs_format.c */,
 				F8A297961C42C9FB00356D68 /* tfs_manipulation.c */,
+				F8A2979E1C42E5D500356D68 /* closedir.c */,
+				F8A2979D1C42E5CF00356D68 /* rewinddir.c */,
+				F8A2979C1C42E5C900356D68 /* ll_volume.h */,
 				F8A297951C42C9F800356D68 /* tfs_mkdir.c */,
 				F8A297941C42C9F400356D68 /* tfs_open.c */,
 				F8A297931C42C9F100356D68 /* tfs_opendir.c */,

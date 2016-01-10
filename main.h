@@ -162,6 +162,17 @@ typedef struct {
   int tfs_next_free;
 } TTTFS_File_Table_Entry;
 
+
+typedef struct{
+    int ninode;
+    int pointeur;
+    int flags;
+    
+} file_descriptor;
+
+extern file_descriptor fdtable[1024];
+extern int fdtend;t
+
 #define SET(m) ((m) & 0x1FFF)
 #define TAG(m) (((m)>>13))
 #define MEM(m,n) ( m <<13 | n)

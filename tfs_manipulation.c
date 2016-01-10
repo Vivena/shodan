@@ -816,9 +816,28 @@ int have_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_
 }
 
 
+int get_last_block(disk_id* id, uint32_t num_partition,int entry_index){
+    
+    
+    
+    return -1;
+}
 
-
-
+/*get_ffd(disk_id* id, uint32_t num_partition){
+    
+    //recuperation du block 0
+    read_block(id,partition_block,num_partition);
+    
+    //verification du block 0
+    memcpy(&temp,(partition_block->octets) + (MAGIC_NUMBER*sizeof(uint32_t)),sizeof(uint32_t));
+    t=uitoi(temp);
+    if (t != TTTFS_MAGIC_NUMBER) {
+        fprintf(stderr, "Error : Partition is not using the same version as the programme.\n");
+        return -2;
+    }
+    
+    
+}*/
 
 
 /*

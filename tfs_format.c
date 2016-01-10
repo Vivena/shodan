@@ -11,6 +11,7 @@
 
 #include "main.h"
 #include "ll.h"
+#include "ll_volume.h"
 
 int main(int argc, char* argv[]){
     uint32_t temp;
@@ -166,7 +167,7 @@ int main(int argc, char* argv[]){
     // Création de l'entrée
     //block_file_table = malloc(sizeof(block));
     //read_block(id,block_file_table,pemplacement+1);
-    entry_root->size = sizeof(uint32_t)+28;
+    entry_root->size = TFS_DIRECTORIES_SIZE*2;
     entry_root->type = 0;
     entry_root->sub_type = 1;
     entry_root->tfs_direct[0] = first;

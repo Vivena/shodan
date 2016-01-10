@@ -8,7 +8,22 @@
 
 #include "main.h"
 #include "ll.h"
+#include "ll_volume.h"
 
+/**
+ * \brief Crée un nouveau répertoire au chemin indiqué.
+ * \details Si le \a path contient le disque (voir détails dans les paramètres),
+ *          alors on va tenter de parcourir le chemin dans la partition indiquée,
+ *          puis créer le dernier nom de répertoire à l'endroit indiqué. Si l'un
+ *          des répertoires à parcourir n'existe pas, une erreur est renvoyée, de
+ *          même si le nom du répertoire à créer existe déjà dans le répertoire 
+ *          courant.
+ * \param path  Chemin de la forme FILE://\a disk/\a volume/\a rep1/.../\a repn ou 
+ *              FILE://HOST/\a rep1/.../\a repn
+ *              avec \a disk le nom du disque, \a volume le numero du volume, et
+ *              \a rep1/.../\a repn le chemin à parcourir.
+ * \return Un \e int, 0 si la fonction s'est terminée sans erreurs, -1 sinon.
+ */
 int tfs_mkdir(const char *path){
   char** splitPath;
   char** directories;
@@ -207,6 +222,11 @@ int tfs_mkdir(const char *path){
   return 0;
 }
 
+/**
+ * \brief Permet d'éxcecuter la commande tfs_mkdir \a path
+ * \param path Voir le path de la fonction tfs_mkdir
+ * \return Un \e int, 0 si la fonction s'est terminée sans erreurs, -1 sinon.
+ */
 int main(int argc, char* argv[]){
   if (argc != 2){
     fprintf(stderr,"Error : Number of argument incorrect.\n");

@@ -1,6 +1,57 @@
 // --------------------------
 // > HEADER PRINCIPAL à inclure dans tous les fichiers .c
 
+/*! \mainpage INDEX
+ *
+ * \section intro_sec Introduction
+ * On peut voir la liste de chaque fichiers avec ses fonctions <a href="files.html">ICI</a>.
+ * Plus de détails sur l'organisation, plus bas.
+ *
+ * \section section1 Makefile
+ *
+ * Positionnez vous dans le répertoire principal.
+ *
+ * \subsection sub1 Compiler le programme (génération des différentes commandes)
+ *
+ * Pour produire TOUS les éxécutables, utilisez la commande \code make \endcode
+ * Si vous souhaitez les créer à part, utilisez la commande \code make nom_de_la_commande \endcode
+ * \subsection sub2 Nettoyer l'arborescence
+ *
+ * Utilisez la commande \code make clean \endcode
+ * Attention, ça n'enlèvera pas les disques créés. Il faut les enlever vous même.
+ *
+ * \section section2 Liste des commandes 
+ * 
+ * Pour les commandes suivantes, nous utilisons l'API de bas niveau (dans ll.h).
+ *
+ * \code tfs_create -s size [name]\endcode
+ *  
+ * Voir la documentation de tfs_create.c.
+ *
+ * \code tfs_partition -p size [-p size]... [name]\endcode
+ *
+ * Voir la documentation de tfs_partition.c.
+ *
+ * \code tfs_analyse [name]\endcode
+ *
+ * Voir la documentation de tfs_analyse.c (quelques affichages supplémentaires par rapport au sujet).
+ *
+ * --------------------------------------------------------------------------------------------
+ *
+ * Les commandes suivantes utilisent des fonctions diverses d'opérations de bas-niveau sur les volumes, elles sont stockées dans la bibliothèque ll_volume.h.
+ *
+ * \code tfs_format -p partition -mf file_count [disk] \endcode
+ *
+ * Voir la documentation de tfs_format.c.
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+
 #ifndef main_h
 #define main_h
 

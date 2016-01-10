@@ -8,6 +8,7 @@
 
 #include "main.h"
 #include "ll.h"
+#include "ll_volume.h"
 
 #define MAGIC_NUMBER 0
 #define FREE_BLOCK_COUNT 4

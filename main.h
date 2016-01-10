@@ -171,7 +171,7 @@ typedef struct{
 } file_descriptor;
 
 extern file_descriptor fdtable[1024];
-extern int fdtend;t
+extern int fdtend;
 
 #define SET(m) ((m) & 0x1FFF)
 #define TAG(m) (((m)>>13))

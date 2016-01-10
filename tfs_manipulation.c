@@ -356,7 +356,7 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index,int 
         read_block(id,idir2,idir2_block);
         
         //recuperation du block indirect1
-        memcpy(&temp,(idir2->octets) + ((((NB_DIRECT(nbtoadd)-(NB_IDIR1))/(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))*sizeof(uint32_t)),sizeof(uint32_t));//a verifier
+        memcpy(&temp,(idir2->octets) + (( (NB_DIRECT(nbtoadd)-(NB_IDIR1))/(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))*sizeof(uint32_t)),sizeof(uint32_t));//a verifier
         idir1_block=uitoi(temp);
         
         //pas de block indirect1 alloué
@@ -366,7 +366,7 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index,int 
             if((e=fill_block(id, num_partition)).val!=0){
                 return e;
             }
-            memcpy((idir2->octets) + (((NB_DIRECT(nbtoadd)-(NB_IDIR1))/(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))*sizeof(uint32_t),&temp,sizeof(uint32_t));
+            memcpy( (idir2->octets) + ((NB_DIRECT(nbtoadd)-(NB_IDIR1))/((TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))*sizeof(uint32_t)),&temp,sizeof(uint32_t));
             write_block(id,idir2,num_partition);
             
             //verification du nombre de block libres restant
@@ -386,7 +386,7 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index,int 
         
         //block indirect1 alloué
         read_block(id,idir1,idir1_block);
-        memcpy(&temp,idir1->octets+(sizeof(uint32_t)*(((NB_DIRECT(nbtoadd)-(NB_IDIR1))%(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))),sizeof(uint32_t));
+        memcpy(&temp,(idir1->octets)+((sizeof(uint32_t)*((NB_DIRECT(nbtoadd)-(NB_IDIR1))%(NB_IDIR1)))),sizeof(uint32_t));
         t=uitoi(temp);
         if (t!=0) {
             fprintf(stderr,"Error : Already have an empty block at the end of the file.");
@@ -677,11 +677,12 @@ error wipe_file(disk_id* id, uint32_t num_partition,int entry_index){
 
 int have_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_block){
     uint32_t temp;
-    int t=1,fsize,offset,num_block_entry,nbofblock;
+    int t=1,offset,num_block_entry,idir1_block=0,idir2_block=0;
     
     block *partition_block = malloc(sizeof(block));
     block *file_entry_block = malloc(sizeof(block));
-    
+    block *idir1 = malloc(sizeof(block));
+    block *idir2 = malloc(sizeof(block));
     
     //recuperation du block 0
     read_block(id,partition_block,num_partition);
@@ -708,94 +709,88 @@ int have_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_
     offset = (int)(FILE_TABLE_BLOCK_SIZE*sizeof(uint32_t));
     num_block_entry = num_partition+1+(entry_index / offset);
     read_block(id,file_entry_block,num_block_entry);
+    num_block++;
     
-    //recuperation de la taille du fichier
-    memcpy(&temp,(file_entry_block->octets) + (FILE_SIZE*sizeof(uint32_t)),sizeof(uint32_t));
-    fsize=uitoi(temp);
-    
-    //recuperation de la taille en block
-    if (fsize==0) {
-        nbofblock=0;
-    }
-    else{
-        if (fsize%BLOCK_SIZE==0) {
-            nbofblock=(fsize/BLOCK_SIZE)-1;
-        }
-        else{
-            nbofblock=(fsize/BLOCK_SIZE);
-        }
-    }
-    
-    if (nbofblock>num_block) {
-        t=0;
-    }
-    
-    return t;
-    
-    free(file_entry_block);
-    free(partition_block);
-}
-
-
-int get_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_block){
-    uint32_t temp;
-    int t=1,fsize,offset,num_block_entry,nbofblock,idir1_block,idir2_block;
-    
-    block *partition_block = malloc(sizeof(block));
-    block *file_entry_block = malloc(sizeof(block));
-    
-    //verification de l'existance d'un next block
-    if (have_next_block(id,num_partition,entry_index,num_block)!=0) {
-        return -1;
-    }
-    //recuperation du block 0
-    read_block(id,partition_block,num_partition);
-    
-    //verification du block 0
-    memcpy(&temp,(partition_block->octets) + (MAGIC_NUMBER*sizeof(uint32_t)),sizeof(uint32_t));
-    t=uitoi(temp);
-    if (t != TTTFS_MAGIC_NUMBER) {
-        fprintf(stderr, "Error : Partition is not using the same version as the programme.\n");
-        
-        return -1;
-    }
-    
-    //verification de file_entry
-    memcpy(&temp,(partition_block->octets) + (VOLUME_MAX_FILE_COUNT*sizeof(uint32_t)),sizeof(uint32_t));
-    t=uitoi(temp);
-    if (t<entry_index) {
-        fprintf(stderr, "Error : File_entry too big./n");
-        
-        return -1;
-    }
-    
-    //recuperation du block contenant la file_entry
-    offset = (int)(FILE_TABLE_BLOCK_SIZE*sizeof(uint32_t));
-    num_block_entry = num_partition+1+(entry_index / offset);
-    read_block(id,file_entry_block,num_block_entry);
-    
-    if (num_block+1>=0 && num_block+1<10) {
-        memcpy(&temp,(file_entry_block->octets) + ((DIRECT+nbofblock)*sizeof(uint32_t)),sizeof(uint32_t));
+    // suivant dans direct
+    if (num_block>=0 && num_block<10) {
+        memcpy(&temp,(file_entry_block->octets) + ((DIRECT+num_block)*sizeof(uint32_t)),sizeof(uint32_t));
         t=uitoi(temp);
+        //n'a pas de next
         if(t==0){
-            //à gerer
+            return -1;
         }
     }
     
-    else if(num_block+1<){
+    //suivant dans indirect 1
+    else if(num_block<NB_IDIR1){
+        memcpy(&temp,(file_entry_block->octets) + (INDIRECT1*sizeof(uint32_t)),sizeof(uint32_t));
+        idir1_block=uitoi(temp);
+        //n'a pas de next et necessite la crea de indire 1
+        if(idir1_block==0){
+            return -1;
+        }
+        
+        //block indirect1 alloué
+        read_block(id,idir1,idir1_block);
+        memcpy(&temp,idir1->octets+(sizeof(uint32_t)*(NB_DIRECT(num_block))),sizeof(uint32_t));
+        
+        t=uitoi(temp);
+        if (t==0) {
+            return -1;
+        }
+        
+        return t;
+    }
+    
+    //suivant dans indirect 2
+    else{
+        //recuperation du block indirect2
+        memcpy(&temp,(file_entry_block->octets) + (INDIRECT2*sizeof(uint32_t)),sizeof(uint32_t));
+        idir2_block=uitoi(temp);
+        
+        //pas de block indirect2 alloué
+        if (idir2_block==0) {
+            return -1;
+        }
+        
+        //block indirect2 alloué
+        read_block(id,idir2,idir2_block);
+        
+        //recuperation du block indirect1
+        memcpy(&temp,(idir2->octets) + ((NB_DIRECT(num_block)-NB_IDIR1)/(NB_IDIR1))*sizeof(uint32_t),sizeof(uint32_t));//a verifier
+        idir1_block=uitoi(temp);
+        //pas de block indirect1 alloué
+        if (idir1_block==0) {
+            return -1;
+        }
+        //block indirect 1 alloué
+        read_block(id,idir1,idir1_block);
+        memcpy(&temp,idir1->octets+(sizeof(uint32_t)*((NB_DIRECT(num_block)-NB_IDIR1)%(NB_IDIR1))),sizeof(uint32_t));
+        
+        t=uitoi(temp);
+        if (t==0) {
+            return -1;
+        }
+        
+        return t;
         
     }
     
     
-    
-    free(file_entry_block);
+    free(idir2);
+    free(idir1);
     free(partition_block);
+    free(file_entry_block);
+    
+    return -1;
 }
+
+
 
 
 
 /*
-  Sépare un pathname dans un tableau avec toutes les infos 
+  Sépare un pathname dans un tableau avec toutes les infos
   necessaires (disque, volume (si pas HOST), repertoires...
 
   @res : tableau de string à remplir

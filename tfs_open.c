@@ -104,7 +104,7 @@ int tfs_open(char *path,int access, int permission){
 		    fprintf(stderr, "Error while filling block.\n");
 		    return -1;
 		  }
-		  read_block(id,block_navigation,fd);
+		  read_block(id,block_navigation,pemplacement+fd);
 		  temp = itoui(current_dir); // numéro dans l'entrée de Fil Table du fichier
 		  memcpy((block_navigation->octets),&temp,sizeof(uint32_t));
 		  append = 0;
@@ -114,10 +114,10 @@ int tfs_open(char *path,int access, int permission){
 		  memcpy((block_navigation->octets) + (2*sizeof(uint32_t)),&temp,sizeof(uint32_t));
 		  temp = itoui(permission);
 		  memcpy((block_navigation->octets) + (3*sizeof(uint32_t)),&temp,sizeof(uint32_t));
-		  write_block(id,block_navigation,fd);
+		  write_block(id,block_navigation,pemplacement+fd);
 		  sync_disk(id);
 
-		  return fd;
+		  return (pemplacement+fd);
 		}
 	      }
 	      // Si on n'est pas encore au dernier repertoire

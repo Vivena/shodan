@@ -97,7 +97,7 @@ DIR * tfs_opendir(char *path,disk_id* id, uint32_t num_partition){
                 
                 memcpy(buff,file_entry_block+((i%32)*DIRENT_SIZE),DIRENT_SIZE*sizeof(char));
                 
-                strncat(dir->__dd_buf,buff,32);
+                memcpy(dir->__dd_buf+i*32,buff,32*(sizeof(char)));
                 
             }
             

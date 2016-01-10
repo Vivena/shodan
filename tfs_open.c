@@ -15,8 +15,8 @@
 int tfs_open(char *path,int access, int permission ){
     char** splitPath;
     char** directories;
-    char* disk_name, current_dir;
-    int a, i,temp, type, partition, pemplacement, exists, index, index_entry, fd, inode, append, rez=-1;
+    char* disk_name;
+    int a, i,temp, current_dir,type, partition, pemplacement, exists, index, index_entry, fd, inode, append, rez=-1;
     
     error e;
     
@@ -68,9 +68,8 @@ int tfs_open(char *path,int access, int permission ){
             // Pour chaque répertoire
 	    current_dir = 0; // numéro de l'entrée dans le File Table
 	    while (directories[0]){
-
 	      // ----------- Test de l'existence de ce répertoire
-	      exists = is_in_directory(id,current_dir,pemplacement,directories[0]);
+	      exists = is_in_directory(id,&current_dir,pemplacement,directories[0]);
 
 	      // ----------- Action en fonction de l'existence
 

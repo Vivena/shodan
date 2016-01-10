@@ -880,7 +880,7 @@ int cut_pathname(char** res, const char* path){
   return e;
 }
 
-int is_in_directory(disk_id* id, int current_dir, int pemplacement, char* name){
+int is_in_directory(disk_id* id, int* current_dir, int pemplacement, char* name){
   int exists = 0, index, index_entry, i, j, temp;
   char dir_name[TFS_DIRECTORIES_SIZE];
 
@@ -889,9 +889,9 @@ int is_in_directory(disk_id* id, int current_dir, int pemplacement, char* name){
 
 
   // Lecture du File Table (recherche du répertoire courrant)
-  index = pemplacement+1+(current_dir/FILE_TABLE_OFFSET);
+  index = pemplacement+1+((*current_dir)/FILE_TABLE_OFFSET);
   read_block(id,block_entry,index);
-  index_entry = (current_dir % FILE_TABLE_OFFSET)*FILE_TABLE_BLOCK_SIZE;
+  index_entry = ((*current_dir) % FILE_TABLE_OFFSET)*FILE_TABLE_BLOCK_SIZE;
 
   // Recherche du repertoire dans l'un des blocs
   for (i = 0; i < 13; i++){
@@ -904,7 +904,7 @@ int is_in_directory(disk_id* id, int current_dir, int pemplacement, char* name){
 	memcpy(dir_name,(block_navigation->octets) + (j*TFS_DIRECTORIES_SIZE) + sizeof(uint32_t),TFS_DIRECTORIES_SIZE-sizeof(uint32_t));
 	if (strcmp(dir_name,name) == 0){
 	  memcpy(&temp,(block_navigation->octets) + (j*TFS_DIRECTORIES_SIZE),sizeof(uint32_t));
-	  current_dir = uitoi(temp);
+	  (*current_dir) = uitoi(temp);
 	  exists = 1;
 	  i = 13; 
 	  j = TFS_DIRECTORIES_MAX_ENTRIES;

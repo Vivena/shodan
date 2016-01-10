@@ -27,8 +27,8 @@
 int tfs_mkdir(const char *path){
   char** splitPath;
   char** directories;
-  char* disk_name, current_dir;
-  int i, temp, type, partition, pemplacement, first_free_block, first_free_file, exists, index, index_entry;
+  char* disk_name;
+  int i, temp, type, current_dir, partition, pemplacement, first_free_block, first_free_file, exists, index, index_entry;
   error e;
 
   block* block_partition = malloc(sizeof(block));
@@ -81,7 +81,7 @@ int tfs_mkdir(const char *path){
     while (directories[0]){
 
       // ----------- Test de l'existence de ce répertoire
-      exists = is_in_directory(id,current_dir,pemplacement,directories[0]);
+      exists = is_in_directory(id,&current_dir,pemplacement,directories[0]);
 
       // ----------- Action en fonction de l'existence
 

@@ -20,8 +20,8 @@
 #define INDIRECT1 13
 #define INDIRECT2 14
 
-#define NB_DIRECT(m) m-10
-#define NB_IDIR1 TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)
+#define NB_DIRECT(m) m-9
+#define NB_IDIR1 (BLOCK_SIZE/sizeof(uint32_t))*BLOCK_SIZE
 
 
 
@@ -275,7 +275,7 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index,int 
     }
     
     //dans indirect1
-    else if(nbtoadd-10 <=(BLOCK_SIZE/sizeof(uint32_t))*BLOCK_SIZE){
+    else if(NB_DIRECT(nbtoadd) <=NB_IDIR1){
         //recuperation du block indirecte1
         memcpy(&temp,(file_entry_block->octets) + (INDIRECT1*sizeof(uint32_t)),sizeof(uint32_t));
         idir1_block=uitoi(temp);
@@ -307,7 +307,7 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index,int 
         
         //block indirect1 alloué
         read_block(id,idir1,idir1_block);
-        memcpy(&temp,idir1->octets+(sizeof(uint32_t)*(nbtoadd-10)),sizeof(uint32_t));
+        memcpy(&temp,idir1->octets+(sizeof(uint32_t)*(NB_DIRECT(nbtoadd))),sizeof(uint32_t));
         t=uitoi(temp);
         if (t!=0) {
             fprintf(stderr,"Error : Already have an empty block at the end of the file.");
@@ -318,7 +318,7 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index,int 
             return e;
         }
         temp=itoui(ffb);
-        memcpy(idir1->octets+(sizeof(uint32_t)*(nbtoadd-10)),&temp,sizeof(uint32_t));
+        memcpy(idir1->octets+(sizeof(uint32_t)*(NB_DIRECT(NB_DIRECT(nbtoadd)))),&temp,sizeof(uint32_t));
     }
 
     //dans indirect2
@@ -356,7 +356,7 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index,int 
         read_block(id,idir2,idir2_block);
         
         //recuperation du block indirect1
-        memcpy(&temp,(idir2->octets) + ((((nbtoadd-10-(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t))*TTTFS_VOLUME_BLOCK_SIZE))/(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))*sizeof(uint32_t)),sizeof(uint32_t));//a verifier
+        memcpy(&temp,(idir2->octets) + ((((NB_DIRECT(nbtoadd)-(NB_IDIR1))/(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))*sizeof(uint32_t)),sizeof(uint32_t));//a verifier
         idir1_block=uitoi(temp);
         
         //pas de block indirect1 alloué
@@ -366,7 +366,7 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index,int 
             if((e=fill_block(id, num_partition)).val!=0){
                 return e;
             }
-            memcpy((idir2->octets) + (((nbtoadd-10-(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t))*TTTFS_VOLUME_BLOCK_SIZE))/(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))*sizeof(uint32_t),&temp,sizeof(uint32_t));
+            memcpy((idir2->octets) + (((NB_DIRECT(nbtoadd)-(NB_IDIR1))/(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))*sizeof(uint32_t),&temp,sizeof(uint32_t));
             write_block(id,idir2,num_partition);
             
             //verification du nombre de block libres restant
@@ -386,7 +386,7 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index,int 
         
         //block indirect1 alloué
         read_block(id,idir1,idir1_block);
-        memcpy(&temp,idir1->octets+(sizeof(uint32_t)*(((nbtoadd-10-(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t))*TTTFS_VOLUME_BLOCK_SIZE))%(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))),sizeof(uint32_t));
+        memcpy(&temp,idir1->octets+(sizeof(uint32_t)*(((NB_DIRECT(nbtoadd)-(NB_IDIR1))%(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))),sizeof(uint32_t));
         t=uitoi(temp);
         if (t!=0) {
             fprintf(stderr,"Error : Already have an empty block at the end of the file.");
@@ -397,7 +397,7 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index,int 
             return e;
         }
         temp=itoui(ffb);
-        memcpy(idir1->octets+(sizeof(uint32_t)*((nbtoadd-10)%(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))),&temp,sizeof(uint32_t));
+        memcpy(idir1->octets+(sizeof(uint32_t)*((NB_DIRECT(nbtoadd))%(TTTFS_VOLUME_BLOCK_SIZE/sizeof(uint32_t)))),&temp,sizeof(uint32_t));
     }
     
     adresse[0]=ffb;
@@ -674,6 +674,125 @@ error wipe_file(disk_id* id, uint32_t num_partition,int entry_index){
     free(file_entry_block);
     return e;
 }
+
+int have_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_block){
+    uint32_t temp;
+    int t=1,fsize,offset,num_block_entry,nbofblock;
+    
+    block *partition_block = malloc(sizeof(block));
+    block *file_entry_block = malloc(sizeof(block));
+    
+    
+    //recuperation du block 0
+    read_block(id,partition_block,num_partition);
+    
+    //verification du block 0
+    memcpy(&temp,(partition_block->octets) + (MAGIC_NUMBER*sizeof(uint32_t)),sizeof(uint32_t));
+    t=uitoi(temp);
+    if (t != TTTFS_MAGIC_NUMBER) {
+        fprintf(stderr, "Error : Partition is not using the same version as the programme.\n");
+        
+        return -1;
+    }
+    
+    //verification de file_entry
+    memcpy(&temp,(partition_block->octets) + (VOLUME_MAX_FILE_COUNT*sizeof(uint32_t)),sizeof(uint32_t));
+    t=uitoi(temp);
+    if (t<entry_index) {
+        fprintf(stderr, "Error : File_entry too big./n");
+        
+        return -1;
+    }
+    
+    //recuperation du block contenant la file_entry
+    offset = (int)(FILE_TABLE_BLOCK_SIZE*sizeof(uint32_t));
+    num_block_entry = num_partition+1+(entry_index / offset);
+    read_block(id,file_entry_block,num_block_entry);
+    
+    //recuperation de la taille du fichier
+    memcpy(&temp,(file_entry_block->octets) + (FILE_SIZE*sizeof(uint32_t)),sizeof(uint32_t));
+    fsize=uitoi(temp);
+    
+    //recuperation de la taille en block
+    if (fsize==0) {
+        nbofblock=0;
+    }
+    else{
+        if (fsize%BLOCK_SIZE==0) {
+            nbofblock=(fsize/BLOCK_SIZE)-1;
+        }
+        else{
+            nbofblock=(fsize/BLOCK_SIZE);
+        }
+    }
+    
+    if (nbofblock>num_block) {
+        t=0;
+    }
+    
+    return t;
+    
+    free(file_entry_block);
+    free(partition_block);
+}
+
+
+int get_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_block){
+    uint32_t temp;
+    int t=1,fsize,offset,num_block_entry,nbofblock,idir1_block,idir2_block;
+    
+    block *partition_block = malloc(sizeof(block));
+    block *file_entry_block = malloc(sizeof(block));
+    
+    //verification de l'existance d'un next block
+    if (have_next_block(id,num_partition,entry_index,num_block)!=0) {
+        return -1;
+    }
+    //recuperation du block 0
+    read_block(id,partition_block,num_partition);
+    
+    //verification du block 0
+    memcpy(&temp,(partition_block->octets) + (MAGIC_NUMBER*sizeof(uint32_t)),sizeof(uint32_t));
+    t=uitoi(temp);
+    if (t != TTTFS_MAGIC_NUMBER) {
+        fprintf(stderr, "Error : Partition is not using the same version as the programme.\n");
+        
+        return -1;
+    }
+    
+    //verification de file_entry
+    memcpy(&temp,(partition_block->octets) + (VOLUME_MAX_FILE_COUNT*sizeof(uint32_t)),sizeof(uint32_t));
+    t=uitoi(temp);
+    if (t<entry_index) {
+        fprintf(stderr, "Error : File_entry too big./n");
+        
+        return -1;
+    }
+    
+    //recuperation du block contenant la file_entry
+    offset = (int)(FILE_TABLE_BLOCK_SIZE*sizeof(uint32_t));
+    num_block_entry = num_partition+1+(entry_index / offset);
+    read_block(id,file_entry_block,num_block_entry);
+    
+    if (num_block+1>=0 && num_block+1<10) {
+        memcpy(&temp,(file_entry_block->octets) + ((DIRECT+nbofblock)*sizeof(uint32_t)),sizeof(uint32_t));
+        t=uitoi(temp);
+        if(t==0){
+            //à gerer
+        }
+    }
+    
+    else if(num_block+1<){
+        
+    }
+    
+    
+    
+    free(file_entry_block);
+    free(partition_block);
+}
+
+
 
 /*
   Sépare un pathname dans un tableau avec toutes les infos 

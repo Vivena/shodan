@@ -10,6 +10,14 @@
 #include "main.h"
 #include "ll.h"
 
+/**
+ * \brief Lance le disque.
+ * \details Réccupère un disk_id pour pouvoir effectuer de nombreuses manipulation sur le disque.
+ *          
+ * \param name Nom du disque.   
+ * \param id L'identifiant du disque sera stocké ici.
+ * \return Un error, à valeur -1 si le disque n'existe pas, 0 sinon.
+ */
 error start_disk(char *name,disk_id *id){
     error e;
     e.val=0;

@@ -9,6 +9,14 @@
 /* Begin PBXFileReference section */
 		F85D0E291C0A168800B8909E /* main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
 		F85D0E2A1C0A169D00B8909E /* ll.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ll.h; sourceTree = "<group>"; };
+		F8A297921C42C9EC00356D68 /* tfs_readdir.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tfs_readdir.c; sourceTree = "<group>"; };
+		F8A297931C42C9F100356D68 /* tfs_opendir.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tfs_opendir.c; sourceTree = "<group>"; };
+		F8A297941C42C9F400356D68 /* tfs_open.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tfs_open.c; sourceTree = "<group>"; };
+		F8A297951C42C9F800356D68 /* tfs_mkdir.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tfs_mkdir.c; sourceTree = "<group>"; };
+		F8A297961C42C9FB00356D68 /* tfs_manipulation.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tfs_manipulation.c; sourceTree = "<group>"; };
+		F8A297971C42C9FF00356D68 /* tfs_format.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tfs_format.c; sourceTree = "<group>"; };
+		F8A297981C42CA0200356D68 /* tfs_close.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tfs_close.c; sourceTree = "<group>"; };
+		F8A297991C42CA0600356D68 /* tfs_analyse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tfs_analyse.c; sourceTree = "<group>"; };
 		F8C77F5B1C08496F00396D57 /* tfs_create.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = tfs_create.c; sourceTree = "<group>"; };
 		F8C77F5C1C08496F00396D57 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		F8C77F5F1C0859D900396D57 /* start_disk.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = start_disk.c; sourceTree = "<group>"; };
@@ -28,6 +36,14 @@
 				F85D0E291C0A168800B8909E /* main.h */,
 				F8C77F631C08720100396D57 /* util.c */,
 				F8C77F5F1C0859D900396D57 /* start_disk.c */,
+				F8A297991C42CA0600356D68 /* tfs_analyse.c */,
+				F8A297981C42CA0200356D68 /* tfs_close.c */,
+				F8A297971C42C9FF00356D68 /* tfs_format.c */,
+				F8A297961C42C9FB00356D68 /* tfs_manipulation.c */,
+				F8A297951C42C9F800356D68 /* tfs_mkdir.c */,
+				F8A297941C42C9F400356D68 /* tfs_open.c */,
+				F8A297931C42C9F100356D68 /* tfs_opendir.c */,
+				F8A297921C42C9EC00356D68 /* tfs_readdir.c */,
 				F8C77F601C085DF700396D57 /* read_block.c */,
 				F8C77F621C08708900396D57 /* write_block.c */,
 				F8F0863C1C29917C00F2FB86 /* tfs_partition.c */,

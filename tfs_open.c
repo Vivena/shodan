@@ -12,17 +12,29 @@
 
 #include <fcntl.h>
 
-int tfs_open(char *path,int access, int permission ){
+
+/**
+ * \brief Ouvre un fichier à partir d'un chemin donné.
+ * \details Créé un fichier temporaire (le file descriptor) dans la partition et le disque indiqués.
+ *          
+ * \param path  Chemin de la forme FILE://\a disk/\a volume/\a rep1/.../\a repn ou 
+ *              FILE://HOST/\a rep1/.../\a repn
+ *              avec \a disk le nom du disque, \a volume le numero du volume, et
+ *              \a rep1/.../\a repn le chemin à parcourir.       
+ * \param acess Flags.
+ * \param permission Permission à prendre en compte (non traité).
+ * \return Le numéro de block où se trouve le file_descriptor.
+ */
+int tfs_open(char *path,int access, int permission){
     char** splitPath;
     char** directories;
     char* disk_name;
-    int a, i,temp, current_dir,type, partition, pemplacement, exists, index, index_entry, fd, inode, append, rez=-1;
+    int i,temp, current_dir,type, partition, pemplacement, exists, fd, append, rez=-1;
     
     error e;
     
     block* block_partition = malloc(sizeof(block));
     block* block0 = malloc(sizeof(block));
-    block* block_entry = malloc(sizeof(block));
     block* block_navigation = malloc(sizeof(block));
     disk_id* id = malloc(sizeof(disk_id));
     
@@ -86,22 +98,6 @@ int tfs_open(char *path,int access, int permission ){
 		  // On récuppère le numéro de bloc qui sera occupé par le fd
 		  memcpy(&temp,(block_partition->octets)+(4*sizeof(uint32_t)),sizeof(uint32_t));
 		  fd = uitoi(temp);
-		  //memcpy(&temp,(block_partition->octets)+(7*sizeof(uint32_t)),sizeof(uint32_t));
-		  //fd = uitoi(temp);
-
-		  // Lecture du File Table (recherche du répertoire courrant)
-		  index = pemplacement+1+(current_dir/FILE_TABLE_OFFSET);
-		  read_block(id,block_entry,index);
-		  index_entry = (current_dir % FILE_TABLE_OFFSET)*FILE_TABLE_BLOCK_SIZE;
-
-		  // Récupération de l'inode du fichier
-		  memcpy(&temp,(block_entry->octets) + index_entry + ((3+i)*sizeof(uint32_t)),sizeof(uint32_t));
-		  inode = uitoi(temp);
-
-		  // Ecriture du fd dans le File Table
-		  a = itoui(fd);
-		  memcpy((block_entry->octets) + index_entry + ((3+i)*sizeof(uint32_t)),&a,sizeof(uint32_t));
-		  write_block(id,block_entry,index);
 
 		  // Remplissage du fd
 		  if (fill_block(id,pemplacement).val != 0){
@@ -109,7 +105,7 @@ int tfs_open(char *path,int access, int permission ){
 		    return -1;
 		  }
 		  read_block(id,block_navigation,fd);
-		  temp = itoui(inode);
+		  temp = itoui(current_dir); // numéro dans l'entrée de Fil Table du fichier
 		  memcpy((block_navigation->octets),&temp,sizeof(uint32_t));
 		  append = 0;
 		  temp = itoui(append);

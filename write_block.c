@@ -13,6 +13,15 @@
 #include "main.h"
 #include "ll.h"
 
+/**
+ * \brief Ecrit physiquement un block dans le disque.
+ * \details Il s'agit de l'écriture des données dans le fichier du disque avec la fonction C write.
+ *          
+ * \param id L'identifiant du disque.
+ * \param block Le block (contenant les 1024 octets) à recopier dans le disque.
+ * \param num Le numéro du block à recopier dans le disque.
+ * \return Un error, à valeur -1 s'il y a un problème avec la fonction C write.
+ */
 error write_physical_block(disk_id *id,block *b,uint32_t num){
     error e;
     e.val=0;
@@ -20,16 +29,23 @@ error write_physical_block(disk_id *id,block *b,uint32_t num){
     uint32_t temp;
     
     lseek(id->id,BLOCK_SIZE*num,SEEK_SET);
-    //printf("writing in position %i in HDD\n",num);
     if((write(id->id,b->octets,sizeof(block)))<0){
-        printf("gros pblm\n");
         e.val=-1;
     }
     memcpy(&temp,b->octets,sizeof(uint32_t));
-    //printf("finish printing %i\n",temp);
+
     return e;
 }
 
+/**
+ * \brief Ecrit un block dans le disque.
+ * \details Il s'agit de l'écriture des données dans le fichier du disque en utilisant la fonction write_physical_block. ici, on prend en compte les données mises en place dans le cache avant d'écrire.
+ *          
+ * \param id L'identifiant du disque.
+ * \param block Le block (contenant les 1024 octets) à recopier dans le disque.
+ * \param num Le numéro du block à recopier dans le disque.
+ * \return Un error, à valeur -1 s'il y a un problème avec la fonction C write.
+ */
 error write_block(disk_id *id,block *b,uint32_t num){
     error e;
     e.val=0;

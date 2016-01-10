@@ -13,6 +13,16 @@
 #include "main.h"
 #include "ll.h"
 
+
+/**
+ * \brief Lit physiquement un block dans le disque.
+ * \details Il s'agit de la lecture des données dans le fichier du disque avec la fonction C read.
+ *          
+ * \param id L'identifiant du disque.
+ * \param block Le block (contenant les 1024 octets) à lire dans le disque.
+ * \param num Le numéro du block à lire dans le disque.
+ * \return Un error, à valeur -1 s'il y a un problème avec la fonction C read.
+ */
 error read_physical_block(disk_id *id,block *b,uint32_t num){
     error e;
     e.val=0;
@@ -57,7 +67,15 @@ error read_physical_block(disk_id *id,block *b,uint32_t num){
     return e;
 }
 
-
+/**
+ * \brief Lit un block dans le disque.
+ * \details Il s'agit de la lecture des données dans le fichier du disque en utilisant la fonction read_physical_block. ici, on prend en compte les données mises en place dans le cache avant de lire.
+ *          
+ * \param id L'identifiant du disque.
+ * \param block Le block (contenant les 1024 octets) à lire dans le disque.
+ * \param num Le numéro du block à lire dans le disque.
+ * \return Un error, à valeur -1 s'il y a un problème avec la fonction C read.
+ */
 error read_block(disk_id *id,block *b,uint32_t num){
     error e;
     e.val=0;

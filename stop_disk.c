@@ -11,8 +11,11 @@
 error stop_disk(disk_id* id){
   error e;
   e.val = 0;
+    int i=0;
+    for (i=0; i<CACHE_MEMORY; i++) {
+        free(id->cache->cmemory[i].data);
+    }
   
-  free(id->cache->cmemory->data);
   free(id->cache->cmemory);
   free(id->cache);
   free(id);

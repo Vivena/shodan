@@ -222,8 +222,8 @@ error fill_entry(disk_id* id, uint32_t num_partition, TTTFS_File_Table_Entry * e
 
 
 /**
- * \brief 
- * \details 
+ * \brief Ajoute un block à la liste des block d'un fichier
+ * \details Regarde l'emplacement du premier lien libre du fichier dont le numero d'inode est entry_index et le fait pointer sur le premier block libre de la partition, puis met à jour le numero du premier block libre.
  *          
  *          
  * \param id L'identifiant du disque.
@@ -457,8 +457,8 @@ error add_block_to_file(disk_id* id, uint32_t num_partition,int entry_index,int 
 }
 
 /**
- * \brief 
- * \details 
+ * \brief Supprime le dernier block occupé d'un fichier
+ * \details Va au dernier lien occupé du fichier dont le numero d'inode est entry_index, regarde le nombre d'octet occupé dans ce block puis supprime le block et met à jour la taille du fichier
  *          
  *          
  * \param id L'identifiant du disque.
@@ -681,7 +681,7 @@ error free_block_from_file(disk_id* id, uint32_t num_partition,int entry_index){
 }
 
 /**
- * \brief 
+ * \brief Supprime tous les blocks d'un fichier.
  * \details 
  *          
  *          
@@ -740,8 +740,8 @@ error wipe_file(disk_id* id, uint32_t num_partition,int entry_index){
 }
 
 /**
- * \brief 
- * \details 
+ * \brief Renvois le block suivant d'un fichier
+ * \details Recois le numero d'un block num_block d'un fichier, regarde si num_block+1 est initialisé. Si il l'est, renvois le lien sur ce block, sinon renvois -1
  *          
  *          
  * \param id L'identifiant du disque.
@@ -768,7 +768,7 @@ int have_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_
     if (t != TTTFS_MAGIC_NUMBER) {
         fprintf(stderr, "Error : Partition is not using the same version as the programme.\n");
         
-        return -2;
+        return -1;
     }
     
     //verification de file_entry
@@ -777,7 +777,7 @@ int have_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_
     if (t<entry_index) {
         fprintf(stderr, "Error : File_entry too big./n");
         
-        return -2;
+        return -1;
     }
     
     //recuperation du block contenant la file_entry
@@ -890,22 +890,7 @@ int have_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_
     return -1;
 }
 
-/**
- * \brief 
- * \details 
- *          
- *          
- * \param id L'identifiant du disque.
- * \param num_partition Numero du block où se trouve le début de la partition.
- * \param entry_index Numero de l'entrée dans le File Table.
- * \return 0 si tout se passe bien, -1 sinon.
- */
-int get_last_block(disk_id* id, uint32_t num_partition,int entry_index){
-    
-    
-    
-    return -1;
-}
+
 
 /*get_ffd(disk_id* id, uint32_t num_partition){
     

@@ -96,6 +96,12 @@ int tfs_open(char *path,int access, int permission){
 		else{ // Sinon, erreur
 		  printf("Opening %s...\n", directories[0]);
 
+		  // Teste si assez de place : peu probable
+		  if (fdtend == 1024){
+		    printf("Error : Too much files opened.\n");
+		    return -1;
+		  }
+
 		  // Pour l'instant append = 0
 		  append = 0;
 

@@ -32,5 +32,6 @@ struct dirent *tfs_readdir(DIR *dirp,disk_id* id){
         memcpy(rez->d_name,buf+sizeof(uint32_t),32-sizeof(uint32_t));
         
     }
+    
     return rez;
 }

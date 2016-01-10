@@ -12,6 +12,8 @@
 
 #include <fcntl.h>
 
+file_descriptor fdtable[1024];
+int fdtend;
 
 /**
  * \brief Ouvre un fichier à partir d'un chemin donné.
@@ -30,12 +32,11 @@ int tfs_open(char *path,int access, int permission){
     char** directories;
     char* disk_name;
     int i,temp, current_dir,type, partition, pemplacement, exists, fd, append, rez=-1;
-    
+    file_descriptor fd_contains;
     error e;
-    
+
     block* block_partition = malloc(sizeof(block));
     block* block0 = malloc(sizeof(block));
-    block* block_navigation = malloc(sizeof(block));
     disk_id* id = malloc(sizeof(disk_id));
     
     // Découpage du path
@@ -95,29 +96,19 @@ int tfs_open(char *path,int access, int permission){
 		else{ // Sinon, erreur
 		  printf("Opening %s...\n", directories[0]);
 
-		  // On récuppère le numéro de bloc qui sera occupé par le fd
-		  memcpy(&temp,(block_partition->octets)+(4*sizeof(uint32_t)),sizeof(uint32_t));
-		  fd = uitoi(temp);
-
-		  // Remplissage du fd
-		  if (fill_block(id,pemplacement).val != 0){
-		    fprintf(stderr, "Error while filling block.\n");
-		    return -1;
-		  }
-		  read_block(id,block_navigation,pemplacement+fd);
-		  temp = itoui(current_dir); // numéro dans l'entrée de Fil Table du fichier
-		  memcpy((block_navigation->octets),&temp,sizeof(uint32_t));
+		  // Pour l'instant append = 0
 		  append = 0;
-		  temp = itoui(append);
-		  memcpy((block_navigation->octets) + sizeof(uint32_t),&temp,sizeof(uint32_t));
-		  temp = itoui(access);
-		  memcpy((block_navigation->octets) + (2*sizeof(uint32_t)),&temp,sizeof(uint32_t));
-		  temp = itoui(permission);
-		  memcpy((block_navigation->octets) + (3*sizeof(uint32_t)),&temp,sizeof(uint32_t));
-		  write_block(id,block_navigation,pemplacement+fd);
-		  sync_disk(id);
 
-		  return (pemplacement+fd);
+		  fd = fdtend++;
+		  fd_contains.ninode = current_dir;
+		  fd_contains.pointeur = append;
+		  fd_contains.ninode = access;
+		  fd_contains.ninode = permission;
+		  fd_contains.host = id;
+
+		  fdtable[fd] = fd_contains;
+
+		  return fd;
 		}
 	      }
 	      // Si on n'est pas encore au dernier repertoire

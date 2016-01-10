@@ -693,7 +693,7 @@ int have_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_
     if (t != TTTFS_MAGIC_NUMBER) {
         fprintf(stderr, "Error : Partition is not using the same version as the programme.\n");
         
-        return -1;
+        return -2;
     }
     
     //verification de file_entry
@@ -702,7 +702,7 @@ int have_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_
     if (t<entry_index) {
         fprintf(stderr, "Error : File_entry too big./n");
         
-        return -1;
+        return -2;
     }
     
     //recuperation du block contenant la file_entry
@@ -717,6 +717,10 @@ int have_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_
         t=uitoi(temp);
         //n'a pas de next
         if(t==0){
+            free(idir2);
+            free(idir1);
+            free(partition_block);
+            free(file_entry_block);
             return -1;
         }
     }
@@ -727,6 +731,10 @@ int have_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_
         idir1_block=uitoi(temp);
         //n'a pas de next et necessite la crea de indire 1
         if(idir1_block==0){
+            free(idir2);
+            free(idir1);
+            free(partition_block);
+            free(file_entry_block);
             return -1;
         }
         
@@ -736,9 +744,16 @@ int have_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_
         
         t=uitoi(temp);
         if (t==0) {
+            free(idir2);
+            free(idir1);
+            free(partition_block);
+            free(file_entry_block);
             return -1;
         }
-        
+        free(idir2);
+        free(idir1);
+        free(partition_block);
+        free(file_entry_block);
         return t;
     }
     
@@ -750,6 +765,10 @@ int have_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_
         
         //pas de block indirect2 alloué
         if (idir2_block==0) {
+            free(idir2);
+            free(idir1);
+            free(partition_block);
+            free(file_entry_block);
             return -1;
         }
         
@@ -761,6 +780,10 @@ int have_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_
         idir1_block=uitoi(temp);
         //pas de block indirect1 alloué
         if (idir1_block==0) {
+            free(idir2);
+            free(idir1);
+            free(partition_block);
+            free(file_entry_block);
             return -1;
         }
         //block indirect 1 alloué
@@ -769,9 +792,16 @@ int have_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_
         
         t=uitoi(temp);
         if (t==0) {
+            free(idir2);
+            free(idir1);
+            free(partition_block);
+            free(file_entry_block);
             return -1;
         }
-        
+        free(idir2);
+        free(idir1);
+        free(partition_block);
+        free(file_entry_block);
         return t;
         
     }
@@ -784,6 +814,8 @@ int have_next_block(disk_id* id, uint32_t num_partition,int entry_index,int num_
     
     return -1;
 }
+
+
 
 
 

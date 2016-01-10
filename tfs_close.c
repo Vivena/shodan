@@ -13,7 +13,7 @@
  * \return 0 si tout se passe bien, -1 sinon.
  */
 int tfs_close(char* disk_name, int partition, int fd){
-  int i, pemplacement, temp, index, index_entry, current_file, res = 0;
+  int i, pemplacement, temp, res = 0;
     
   block* block0 = malloc(sizeof(block));
   disk_id* id = malloc(sizeof(disk_id));

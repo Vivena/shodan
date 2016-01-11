@@ -15,7 +15,7 @@
 
 int main(int argc, char* argv[]){
     uint32_t temp;
-    int a,b,i,nb,npart,mf,first,pemplacement=0;
+    int a,i,nb,npart,mf,first,pemplacement=0;
     char* name;
     disk_id* id;
     error e;

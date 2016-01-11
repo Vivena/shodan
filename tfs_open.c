@@ -34,7 +34,7 @@ int tfs_open(char *path,int access, int permission){
     int i,temp, current_dir,type, partition, pemplacement, exists, fd, append, rez=-1;
     file_descriptor fd_contains;
     error e;
-
+    
     block* block_partition = malloc(sizeof(block));
     block* block0 = malloc(sizeof(block));
     disk_id* id = malloc(sizeof(disk_id));
@@ -79,58 +79,57 @@ int tfs_open(char *path,int access, int permission){
             read_block(id,block_partition,pemplacement);
             
             // Pour chaque répertoire
-	    current_dir = 0; // numéro de l'entrée dans le File Table
-	    while (directories[0]){
-	      // ----------- Test de l'existence de ce répertoire
-	      exists = is_in_directory(id,&current_dir,pemplacement,directories[0]);
-
-	      // ----------- Action en fonction de l'existence
-
-	      // Si on est au dernier repertoire
-	      if (!directories[1][0]){
-		printf("Preparing to create %s...\n", directories[0]);
-		if (!exists){ // Si n'existe pas, on créé un nouveau fichier
-
-		  break;
-		}
-		else{ // Sinon, erreur
-		  printf("Opening %s...\n", directories[0]);
-
-		  // Teste si assez de place : peu probable
-		  if (fdtend == 1024){
-		    printf("Error : Too much files opened.\n");
-		    return -1;
-		  }
-
-		  // Pour l'instant append = 0
-		  append = 0;
-
-		  fd = fdtend++;
-		  fd_contains.ninode = current_dir;
-		  fd_contains.pointeur = append;
-		  fd_contains.ninode = access;
-		  fd_contains.ninode = permission;
-		  fd_contains.host = id;
-
-		  fdtable[fd] = fd_contains;
-
-		  return fd;
-		}
-	      }
-	      // Si on n'est pas encore au dernier repertoire
-	      else{
-		printf("Searching for %s... ", directories[0]);
-	
-		if (!exists){
-		  printf("\nError : directory %s doesn't exists.\n", directories[0]);
-		  return -1;
-		}
-		else{
-		  printf("ok\n");
-		}
-	      }
-	      directories++;
-	    }
+            current_dir = 0; // numéro de l'entrée dans le File Table
+            while (directories[0]){
+                // ----------- Test de l'existence de ce répertoire
+                exists = is_in_directory(id,&current_dir,pemplacement,directories[0]);
+                
+                // ----------- Action en fonction de l'existence
+                
+                // Si on est au dernier repertoire
+                if (!directories[1][0]){
+                    if (!exists){ // Si n'existe pas
+                        fprintf(stderr,"Error : Path incorrect.\n");
+                        return -1;
+                    }
+                    else{ // Sinon, erreur
+                        printf("Opening %s...\n", directories[0]);
+                        
+                        // Teste si assez de place : peu probable
+                        if (fdtend == 1024){
+                            printf("Error : Too much files opened.\n");
+                            return -1;
+                        }
+                        
+                        // Pour l'instant append = 0
+                        append = 0;
+                        
+                        fd = fdtend++;
+                        fd_contains.ninode = current_dir;
+                        fd_contains.pointeur = append;
+                        fd_contains.ninode = access;
+                        fd_contains.flags = permission;
+                        fd_contains.host = id;
+                        
+                        fdtable[fd] = fd_contains;
+                        
+                        return fd;
+                    }
+                }
+                // Si on n'est pas encore au dernier repertoire
+                else{
+                    printf("Searching for %s... ", directories[0]);
+                    
+                    if (!exists){
+                        printf("\nError : directory %s doesn't exists.\n", directories[0]);
+                        return -1;
+                    }
+                    else{
+                        printf("ok\n");
+                    }
+                }
+                directories++;
+            }
             break;
         default:
             rez=-1;

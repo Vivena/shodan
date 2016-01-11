@@ -53,7 +53,7 @@ DIR * tfs_opendir(char *path,disk_id* id, uint32_t num_partition){
             
             fd=tfs_open(path,0,0);
             if (fd==-1) {
-                //tfs_close(fd);
+                tfs_close(fd);
                 return NULL;
             }
             
